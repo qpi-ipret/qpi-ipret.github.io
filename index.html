@@ -29,6 +29,71 @@
         const da = String(d.getDate()).padStart(2, "0");
         return `${y}-${m}-${da}`;
       };
+
+//_______________
+    
+
+
+
+      const handleReserve = (e) => {
+    e.preventDefault();
+    setError("");
+    setOk("");
+
+    if (!isOpen) {
+      setError("예약은 매일 14:00에 오픈됩니다.");
+      return;
+    }
+    if (!studentId.trim() || !name.trim()) {
+      setError("학번과 이름을 모두 입력해 주세요.");
+      return;
+    }
+    if (!/^\\d{2,}$/.test(studentId.trim())) {
+      setError("학번은 숫자로 입력해 주세요.");
+      return;
+    }
+    if (list.length >= capacity) {
+      setError("오늘 예약이 마감되었습니다.");
+      return;
+    }
+    const exists = list.some((r) => r.studentId === studentId.trim());
+    if (exists) {
+      setError("해당 학번으로 이미 예약되었습니다.");
+      return;
+    }
+
+    const entry = {
+      studentId: studentId.trim(),
+      name: name.trim(),
+      ts: getSeoulNow().toISOString(),
+    };
+    const next = [...list, entry].sort((a, b) => new Date(a.ts) - new Date(b.ts));
+    setList(next);
+    setOk("예약이 완료되었습니다! 오늘 야간 자율학습 시간에 이용 가능합니다.");
+    setStudentId("");
+    setName("");
+
+    // 구글 Apps Script 웹 앱에 예약 데이터를 전송
+    const data = {
+      studentId: studentId.trim(),
+      name: name.trim(),
+    };
+
+    fetch("YOUR_GOOGLE_APPS_SCRIPT_URL", { // 위에서 복사한 웹 앱 URL로 변경
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    })
+    .then(response => response.text())
+    .then(result => console.log(result))
+    .catch(error => console.error('Error:', error));
+};
+
+
+
+      
       const [now, setNow] = useState(getSeoulNow());
       const todayKey = useMemo(() => `reservations-${formatYMD(now)}`, [now]);
       const openingTime = useMemo(() => {

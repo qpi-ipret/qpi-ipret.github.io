@@ -96,7 +96,7 @@
           setError("학번과 이름을 모두 입력해 주세요.");
           return;
         }
-        if (!/^\\d{2,}$/.test(studentId.trim())) {
+        if (!/^\d{2,}$/.test(studentId.trim())) {
           setError("학번은 숫자로 입력해 주세요.");
           return;
         }

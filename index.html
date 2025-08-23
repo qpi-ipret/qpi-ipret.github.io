@@ -102,8 +102,9 @@
         return d;
       }, [now]);
 
-      const msUntilOpen = Math.max(0, openingTime - now);
-      const isOpen = msUntilOpen === 0;
+      //const msUntilOpen = Math.max(0, openingTime - now);
+      //const isOpen = msUntilOpen === 0;
+      const isOpen = true;  // 예약을 항상 받을 수 있도록 수정
 
       useEffect(() => {
         const t = setInterval(() => setNow(getSeoulNow()), 1000);

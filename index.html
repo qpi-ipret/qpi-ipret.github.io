@@ -79,7 +79,7 @@
       name: name.trim(),
     };
 
-    fetch("https://script.google.com/macros/s/AKfycbwBOmM8avi8OTzuINRVFOni3wb6cKZYykpSvaIlsYsBQvEQ6X8eg-S2qhw_nkqgfs5zQw/exec", { // 위에서 복사한 웹 앱 URL로 변경
+    fetch("https://script.google.com/macros/s/AKfycbwBOmM8avi8OTzuINRVFOni3wb6cKZYykpSvaIlsYsBQvEQ6X8eg-S2qhw_nkqgfs5zQw/exec", { // 저기 그 그 유알엘
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -101,10 +101,10 @@
         d.setHours(14, 0, 0, 0); // 14:00 고정
         return d;
       }, [now]);
-
+//까먹지 않아야하는 위치
       //const msUntilOpen = Math.max(0, openingTime - now);
       //const isOpen = msUntilOpen === 0;
-      const isOpen = true;  // 예약을 항상 받을 수 있도록 수정
+      const isOpen = true;  // 예약을 항상 받을 수 있도록,,
 
       useEffect(() => {
         const t = setInterval(() => setNow(getSeoulNow()), 1000);

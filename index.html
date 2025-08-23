@@ -16,10 +16,10 @@
   </style>
 </head>
 <body>
-  <div id="root"></div> <!-- React가 렌더링할 div 요소 -->
+  <div id="root"></div>
 
   <script type="text/babel">
-    const { useEffect, useMemo, useState, useRef } = React;
+    const { useEffect, useMemo, useRef, useState } = React;
 
     function StudyCafeReservation() {
       const getSeoulNow = () => new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Seoul" }));
@@ -30,30 +30,113 @@
         return `${y}-${m}-${da}`;
       };
 
-      const isOpen = true; // 예약을 항상 받을 수 있도록 수정
+//_______________
+    
+
+
 
       const handleReserve = (e) => {
-        e.preventDefault();
-        setError("");
-        setOk("");
+    e.preventDefault();
+    setError("");
+    setOk("");
 
-        if (!studentId.trim() || !name.trim()) {
-          setError("학번과 이름을 모두 입력해 주세요.");
-          return;
+    if (!isOpen) {
+      setError("예약은 매일 14:00에 오픈됩니다.");
+      return;
+    }
+    if (!studentId.trim() || !name.trim()) {
+      setError("학번과 이름을 모두 입력해 주세요.");
+      return;
+    }
+    if (!/^\\d{2,}$/.test(studentId.trim())) {
+      setError("학번은 숫자로 입력해 주세요.");
+      return;
+    }
+    if (list.length >= capacity) {
+      setError("오늘 예약이 마감되었습니다.");
+      return;
+    }
+    const exists = list.some((r) => r.studentId === studentId.trim());
+    if (exists) {
+      setError("해당 학번으로 이미 예약되었습니다.");
+      return;
+    }
+
+    const entry = {
+      studentId: studentId.trim(),
+      name: name.trim(),
+      ts: getSeoulNow().toISOString(),
+    };
+    const next = [...list, entry].sort((a, b) => new Date(a.ts) - new Date(b.ts));
+    setList(next);
+    setOk("예약이 완료되었습니다! 오늘 야간 자율학습 시간에 이용 가능합니다.");
+    setStudentId("");
+    setName("");
+
+    // 구글 Apps Script 웹 앱에 예약 데이터를 전송
+    const data = {
+      studentId: studentId.trim(),
+      name: name.trim(),
+    };
+
+    fetch("YOUR_GOOGLE_APPS_SCRIPT_URL", { // 위에서 복사한 웹 앱 URL로 변경
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    })
+    .then(response => response.text())
+    .then(result => console.log(result))
+    .catch(error => console.error('Error:', error));
+};
+
+
+
+      
+      const [now, setNow] = useState(getSeoulNow());
+      const todayKey = useMemo(() => `reservations-${formatYMD(now)}`, [now]);
+      const openingTime = useMemo(() => {
+        const d = getSeoulNow();
+        d.setHours(14, 0, 0, 0); // 14:00 고정
+        return d;
+      }, [now]);
+
+      //const msUntilOpen = Math.max(0, openingTime - now);
+      //const isOpen = msUntilOpen === 0;
+      const isOpen = true;  // 예약을 항상 받을 수 있도록 수정
+
+      useEffect(() => {
+        const t = setInterval(() => setNow(getSeoulNow()), 1000);
+        return () => clearInterval(t);
+      }, []);
+
+      const [list, setList] = useState(() => {
+        try {
+          const raw = localStorage.getItem(todayKey);
+          return raw ? JSON.parse(raw) : [];
+        } catch (e) {
+          return [];
         }
+      });
 
-        const entry = {
-          studentId: studentId.trim(),
-          name: name.trim(),
-          ts: getSeoulNow().toISOString(),
-        };
-        setList(prevList => [...prevList, entry].sort((a, b) => new Date(a.ts) - new Date(b.ts)));
-        setOk("예약이 완료되었습니다!");
+      const prevKeyRef = useRef(todayKey);
+      useEffect(() => {
+        if (prevKeyRef.current !== todayKey) {
+          prevKeyRef.current = todayKey;
+          try {
+            const raw = localStorage.getItem(todayKey);
+            setList(raw ? JSON.parse(raw) : []);
+          } catch (e) {
+            setList([]);
+          }
+        }
+      }, [todayKey]);
 
-        // 구글 Apps Script 웹 앱에 예약 데이터를 전송 (이미 구현한 대로)
-      };
+      useEffect(() => {
+        localStorage.setItem(todayKey, JSON.stringify(list));
+      }, [list, todayKey]);
 
-      const [list, setList] = useState([]);
       const [studentId, setStudentId] = useState("");
       const [name, setName] = useState("");
       const [error, setError] = useState("");
@@ -62,39 +145,201 @@
       const capacity = 15;
       const remaining = Math.max(0, capacity - list.length);
 
+      const handleReserve = (e) => {
+        e.preventDefault();
+        setError("");
+        setOk("");
+
+        if (!isOpen) {
+          setError("예약은 매일 14:00에 오픈됩니다.");
+          return;
+        }
+        if (!studentId.trim() || !name.trim()) {
+          setError("학번과 이름을 모두 입력해 주세요.");
+          return;
+        }
+        if (!/^\\d{2,}$/.test(studentId.trim())) {
+          setError("학번은 숫자로 입력해 주세요.");
+          return;
+        }
+        if (list.length >= capacity) {
+          setError("오늘 예약이 마감되었습니다.");
+          return;
+        }
+        const exists = list.some((r) => r.studentId === studentId.trim());
+        if (exists) {
+          setError("해당 학번으로 이미 예약되었습니다.");
+          return;
+        }
+
+        const entry = {
+          studentId: studentId.trim(),
+          name: name.trim(),
+          ts: getSeoulNow().toISOString(),
+        };
+        const next = [...list, entry].sort((a, b) => new Date(a.ts) - new Date(b.ts));
+        setList(next);
+        setOk("예약이 완료되었습니다! 오늘 야간 자율학습 시간에 이용 가능합니다.");
+        setStudentId("");
+        setName("");
+      };
+
+      const maskId = (id) => (id.length <= 2 ? id : `${id.slice(0, 2)}••••`);
+      const timeLeft = () => {
+        const ms = msUntilOpen;
+        const s = Math.floor(ms / 1000);
+        const hh = String(Math.floor(s / 3600)).padStart(2, "0");
+        const mm = String(Math.floor((s % 3600) / 60)).padStart(2, "0");
+        const ss = String(s % 60).padStart(2, "0");
+        return `${hh}:${mm}:${ss}`;
+      };
+
+      const shell = "min-h-screen bg-white text-neutral-900";
+      const container = "max-w-3xl mx-auto px-6";
+      const glass = "backdrop-blur-xl bg-white/70 border border-neutral-200 rounded-3xl shadow-lg";
+      const btnBase = "rounded-2xl px-5 py-3 font-medium transition disabled:opacity-50 disabled:cursor-not-allowed";
+      const btnPrimary = btnBase + " bg-black text-white hover:bg-black/90 active:scale-[0.99]";
+      const inputBase = "w-full rounded-2xl border border-neutral-300 px-4 py-3 focus:outline-none focus:ring-4 focus:ring-neutral-200 transition bg-white";
+
       return (
-        <main>
-          <header>스터디 카페 예약 사이트</header>
-          <section>
-            <form onSubmit={handleReserve}>
-              <input
-                type="text"
-                placeholder="학번"
-                value={studentId}
-                onChange={(e) => setStudentId(e.target.value)}
-              />
-              <input
-                type="text"
-                placeholder="이름"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-              />
-              <button type="submit">예약하기</button>
-            </form>
-            {error && <div>{error}</div>}
-            {ok && <div>{ok}</div>}
-            <div>잔여 좌석: {remaining} / {capacity}</div>
+        <main className={shell} style={{ fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" }}>
+          <header className="sticky top-0 z-30 border-b border-neutral-200/60 bg-white/70 backdrop-blur supports-[backdrop-filter]:bg-white/50">
+            <div className={container + " flex items-center justify-between h-16"}>
+              <div className="flex items-center gap-2">
+                <div className="w-6 h-6 rounded-full bg-black" />
+                <span className="text-sm tracking-tight text-neutral-700">스터디 카페 예약 사이트</span>
+              </div>
+              <div className="text-xs text-neutral-500">Asia/Seoul · 매일 14:00 오픈</div>
+            </div>
+          </header>
+
+          <section className={container + " pt-14 pb-10"}>
+            <div className="flex flex-col items-start gap-6">
+              <h1 className="text-4xl md:text-6xl leading-tight tracking-tight font-semibold">
+                오늘의 <span className="inline-block bg-black text-white px-2 rounded-xl">스터디 카페</span>
+                <br/> 1층 언어실습실에서 만나요.
+              </h1>
+              <p className="text-neutral-600 text-lg md:text-xl">
+                매일 14:00 선착순 <strong>15명</strong> 예약 · 당일 야간 자율학습시간 이용
+              </p>
+            </div>
           </section>
+
+          <section className={container + " pb-16"}>
+            <div className={glass + " p-6 md:p-8"}>
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div className="space-y-1">
+                  <div className="text-sm text-neutral-500">오늘 날짜</div>
+                  <div className="text-2xl font-medium">{formatYMD(now)}</div>
+                </div>
+                <div className="text-right">
+                  {isOpen ? (
+                    <div className="inline-flex items-center gap-2 rounded-full border border-green-600/20 bg-green-50 px-3 py-1 text-green-700">
+                      <span className="w-2 h-2 rounded-full bg-green-500 inline-block" />
+                      예약 오픈
+                    </div>
+                  ) : (
+                    <div className="inline-flex items-center gap-2 rounded-full border border-neutral-300 bg-neutral-50 px-3 py-1 text-neutral-700">
+                      <span className="w-2 h-2 rounded-full bg-neutral-400 inline-block" />
+                      {`오픈까지 ${timeLeft()}`}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className="mt-6 grid md:grid-cols-3 gap-4">
+                <div className="rounded-2xl border border-neutral-200 p-4">
+                  <div className="text-sm text-neutral-500">장소</div>
+                  <div className="text-lg font-medium">1층 언어실습실</div>
+                </div>
+                <div className="rounded-2xl border border-neutral-200 p-4">
+                  <div className="text-sm text-neutral-500">잔여 좌석</div>
+                  <div className="text-lg font-medium">{remaining} / {capacity}</div>
+                </div>
+                <div className="rounded-2xl border border-neutral-200 p-4">
+                  <div className="text-sm text-neutral-500">상태</div>
+                  <div className="text-lg font-medium">{isOpen ? "예약 가능" : "대기 중"}</div>
+                </div>
+              </div>
+
+              <form onSubmit={handleReserve} className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-3">
+                <input
+                  className={inputBase}
+                  type="text"
+                  inputMode="numeric"
+                  placeholder="학번"
+                  value={studentId}
+                  onChange={(e) => setStudentId(e.target.value)}
+                  disabled={!isOpen || list.length >= capacity}
+                  aria-label="학번"
+                />
+                <input
+                  className={inputBase}
+                  type="text"
+                  placeholder="이름"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  disabled={!isOpen || list.length >= capacity}
+                  aria-label="이름"
+                />
+                <button
+                  className={btnPrimary}
+                  type="submit"
+                  disabled={!isOpen || list.length >= capacity}
+                >
+                  예약하기
+                </button>
+              </form>
+
+              {error && (
+                <div className="mt-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-red-700 text-sm">{error}</div>
+              )}
+              {ok && (
+                <div className="mt-4 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-emerald-700 text-sm">{ok}</div>
+              )}
+
+              <div className="mt-10">
+                <div className="flex items-end justify-between">
+                  <h2 className="text-xl font-semibold tracking-tight">오늘의 예약 명단</h2>
+                  <div className="text-xs text-neutral-500">선착순 정렬 (최대 15명)</div>
+                </div>
+                <ol className="mt-4 divide-y divide-neutral-200 border border-neutral-200 rounded-2xl overflow-hidden">
+                  {list.length === 0 && (
+                    <li className="p-4 text-neutral-500 text-sm">아직 예약이 없어요. 14:00에 오픈됩니다.</li>
+                  )}
+                  {list.map((r, idx) => (
+                    <li key={r.studentId} className="flex items-center justify-between p-4">
+                      <div className="flex items-center gap-4">
+                        <span className="inline-flex w-7 h-7 items-center justify-center rounded-full border border-neutral-300 text-sm">
+                          {idx + 1}
+                        </span>
+                        <div>
+                          <div className="font-medium">{r.name}</div>
+                          <div className="text-xs text-neutral-500">학번 {maskId(r.studentId)}</div>
+                        </div>
+                      </div>
+                      <div className="text-xs text-neutral-500">
+                        {new Date(r.ts).toLocaleTimeString("ko-KR", { timeZone: "Asia/Seoul", hour: "2-digit", minute: "2-digit", second: "2-digit" })}
+                      </div>
+                    </li>
+                  ))}
+                </ol>
+              </div>
+            </div>
+          </section>
+
+          <footer className="border-t border-neutral-200/60">
+            <div className={container + " py-10 text-sm text-neutral-500 flex flex-col md:flex-row gap-4 md:items-center md:justify-between"}>
+              <div>© {now.getFullYear()} 스터디 카페 예약 사이트</div>
+              <div className="opacity-80">매일 14:00 오픈 · 당일 야간 자율학습 시간 이용 가능</div>
+            </div>
+          </footer>
         </main>
       );
     }
 
-    const root = document.getElementById("root");  // 반드시 존재해야 하는 div
-    if (root) {
-      ReactDOM.createRoot(root).render(<StudyCafeReservation />); // React 18에서 createRoot() 방식
-    } else {
-      console.error("The 'root' div is missing.");
-    }
+    const root = ReactDOM.createRoot(document.getElementById("root"));
+    root.render(<StudyCafeReservation />);
   </script>
 </body>
 </html>

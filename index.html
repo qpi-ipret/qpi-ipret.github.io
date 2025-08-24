@@ -3,97 +3,377 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta property="og:image" content="https://qpi-ipret.github.io/reserve/cnsh.png" />
-  <title>충남과학고 스터디 카페 예약</title>
-  <link rel="icon" href="logo.ico" type="image/x-icon" />
-
-  <!-- Pretendard Variable -->
-  <link rel="preconnect" href="https://cdn.jsdelivr.net" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
-
-  <!-- Tailwind CSS (CDN) -->
+  <meta property="og:image" content="https://qpi-ipret.github.io/reserve/cnsh.png">
+  <title>충남과학고 스터디 카페 예약 사이트</title>
+  <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ["Pretendard Variable", "system-ui", "-apple-system", "Segoe UI", "Roboto", "Helvetica", "Arial", "sans-serif"],
-          },
-          colors: {
-            brand: {
-              50: "#f1f6ff",
-              100: "#e5efff",
-              200: "#cfe2ff",
-              500: "#234C93",
-              600: "#1f417e",
-              900: "#0f2242",
-            },
-          },
-          boxShadow: {
-            soft: "0 10px 30px rgb(0 0 0 / 0.06)",
-          },
-          borderRadius: {
-            blob: "42px",
-          },
-          keyframes: {
-            fadeUp: { "0%": { opacity: 0, transform: "translateY(8px)" }, "100%": { opacity: 1, transform: "translateY(0)" } },
-            shimmer: { "100%": { transform: "translateX(100%)" } },
-          },
-          animation: {
-            fadeUp: "fadeUp 400ms ease-out",
-            shimmer: "shimmer 1.2s linear infinite",
-          },
-        },
-      },
-    };
-  </script>
-
+  <link rel="icon" href="logo.ico" type="image/x-icon">
+  <link rel="icon" href="logo.ico" type="image/x-icon" media="(prefers-color-scheme: light)">
+  <link rel="icon" href="logo-dark.ico" type="image/x-icon" media="(prefers-color-scheme: dark)"> 
   <!-- React 18 UMD -->
   <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
   <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
   <!-- Babel for in-browser JSX transform -->
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-
   <style>
+    @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css');
     html, body { background: white; }
-    /* Nice selection color */
-    ::selection { background: #e5efff; color: #0f2242; }
+    .qpilogo {
+      mask-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQAAAAEACAMAAABrrFhUAAAAIGNIUk0AAHomAACAhAAA+gAAAIDoAAB1MAAA6mAAADqYAAAXcJy6UTwAAAAHdElNRQfpCBcWJxDf+LnOAAAAAW9yTlQBz6J3mgAAAwBQTFRFIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMj////MDFs+QAAAP50Uk5TAAEC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');
+      mask-size: contain;
+    }
   </style>
 </head>
-<body class="font-sans antialiased text-neutral-900">
+<body>
   <div id="root"></div>
-
+  
   <script type="text/babel">
-    const { useEffect, useMemo, useState } = React;
-    const URL = "https://script.google.com/macros/s/AKfycbyvr2pZewF0TE2QnJUKbbK94q-FrrESmsRoqZXcxVQRQVk94zToCJh8nceJuZHBJDkzZA/exec"; // version 13
-
-    function getSeoulNow() {
-      return new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Seoul" }));
-    }
-
-    function formatYMD(d) {
-      const y = d.getFullYear();
-      const m = String(d.getMonth() + 1).padStart(2, "0");
-      const da = String(d.getDate()).padStart(2, "0");
-      return `${y}-${m}-${da}`;
-    }
-
-    const MaskId = (id) => id.length <= 2 ? id : `${id.slice(0, 2)}••••`;
-
-    function Badge({ tone = "green", children }) {
-      const tones = {
-        green: "border-green-600/20 bg-green-50 text-green-700",
-        red: "border-red-600/20 bg-red-50 text-red-700",
-        amber: "border-amber-600/20 bg-amber-50 text-amber-700",
-        gray: "border-neutral-300 bg-white text-neutral-700",
-        blue: "border-brand-500/20 bg-brand-50 text-brand-600",
+    const { useEffect, useMemo, useRef, useState } = React;
+    const URL = "https://script.google.com/macros/s/AKfycbzreOJcyitgn7MN_7jWyQByG1bPLbQYD7RLQqtTVQrOsUayRZwQPHCttFd_6lZhdrZ2HA/exec" // version 18
+    
+    function StudyCafeReservation() {
+      const getSeoulNow = () => new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Seoul" }));
+      const formatYMD = (d) => {
+        const y = d.getFullYear();
+        const m = String(d.getMonth() + 1).padStart(2, "0");
+        const da = String(d.getDate()).padStart(2, "0");
+        return `${y}-${m}-${da}`;
       };
+
+      const [now, setNow] = useState(getSeoulNow());
+      const closingTime = useMemo(() => {
+        const d = getSeoulNow();
+        d.setHours(18, 20, 0, 0); // 18:20 고정
+        return d;
+      }, [now]);
+      const msUntilClose = Math.max(0, closingTime - now);
+
+      const openingTime = useMemo(() => {
+        const d = getSeoulNow();
+        d.setHours(13, 20, 0, 0); // 13:20 고정
+        if (msUntilClose===0) d.setDate(d.getDate() + 1);
+        return d;
+      }, [now]);
+      const msUntilOpen = Math.max(0, openingTime - now);
+
+      const isOpen = (msUntilOpen === 0 && msUntilClose !== 0);
+      //const isOpen = true;
+
+      useEffect(() => {
+        const t = setInterval(() => setNow(getSeoulNow()), 1000);
+        return () => clearInterval(t);
+      }, []);
+
+      const [listLoading, setListLoading] = useState(true);
+      const [list, setList] = useState([]);
+
+      useEffect(() => {
+        (async () => {
+          try {
+            return await fetch(URL, {
+              method: "GET"
+            }).then(response => response.text())
+            .catch(error => console.error('Error:', error));
+          } catch (e) {
+            return [];
+          }
+        })().then((data) => {
+          setList(JSON.parse(data).map((e) => ({studentId:e[0], name:e[1], date: new Date(e[3])})));
+          setListLoading(false);
+          console.log("init start")
+        })
+      }, [])
+
+      const [studentId, setStudentId] = useState("");
+      const [name, setName] = useState("");
+      const [error, setError] = useState("");
+      const [ok, setOk] = useState("");
+
+      const capacity = 15;
+      const remaining = Math.max(0, capacity - list.length);
+
+      const handleReserve = (e) => {
+        e.preventDefault();
+        setError("");
+        setOk("");
+        
+        if (!isOpen) {
+          setError("예약은 매일 13:20에서 18:20까지 오픈됩니다.");
+          return;
+        }
+        if (!studentId.trim() || !name.trim()) {
+          setError("학번과 이름을 모두 입력해 주세요.");
+          return;
+        }
+        if (!/^\d{2,}$/.test(studentId.trim())) {
+          setError("학번은 2자리 이상의 숫자로 입력해 주세요.");
+          return;
+        }
+
+        setError("예약 요청을 보냈습니다. 잠시 기다려 주세요...")
+        
+        const entry = {
+          studentId: studentId.trim(),
+          name: name.trim(),
+          date: getSeoulNow()
+        };
+        
+        const data = {
+          studentId: studentId.trim(),
+          name: name.trim(),
+        };
+        
+        fetch(URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "text/plain;charset=utf-8",
+          },
+          body: JSON.stringify(data),
+        }).then(response => response.text())
+        .then(result => {
+          if (result.startsWith("fail")) {
+            let msg = result.substring(6).split("\n");
+            setError(msg[0]); // fail: [실패사유]
+            if (msg.length < 2) return;
+            setList(JSON.parse(msg[1]).map((e) => ({studentId:e[0], name:e[1], date: new Date(e[3])})));
+            return;
+          }
+          setList(JSON.parse(result).map((e) => ({studentId:e[0], name:e[1], date: new Date(e[3])})));
+          setStudentId("");
+          setName("");
+          setError("");
+          setOk("예약이 완료되었습니다! 오늘 야간 자율학습 시간에 이용 가능합니다.");
+        })
+        .catch(error => console.error('Error:', error));
+      }
+
+      const maskId = (id) => (id.length <= 2 ? id : `${id.slice(0, 2)}••••`);
+      const timeLeft = () => {
+        const ms = msUntilOpen;
+        const s = Math.floor(ms / 1000);
+        const hh = String(Math.floor(s / 3600)).padStart(2, "0");
+        const mm = String(Math.floor((s % 3600) / 60)).padStart(2, "0");
+        const ss = String(s % 60).padStart(2, "0");
+        return `${hh}:${mm}:${ss}`;
+      };
+      const timeLeftClosing = () => {
+        const ms = msUntilClose;
+        const s = Math.floor(ms / 1000);
+        const hh = String(Math.floor(s / 3600)).padStart(2, "0");
+        const mm = String(Math.floor((s % 3600) / 60)).padStart(2, "0");
+        const ss = String(s % 60).padStart(2, "0");
+        return `${hh}:${mm}:${ss}`;
+      };
+
+      const shell = "min-h-screen bg-white text-neutral-900";
+      const container = "max-w-3xl mx-auto px-6";
+      const glass = "backdrop-blur-xl bg-white/70 border border-neutral-200 rounded-[42px] shadow-lg";
+      const btnBase = "rounded-[16px] px-5 py-3 font-medium transition disabled:opacity-50 disabled:cursor-not-allowed";
+      const btnPrimary = btnBase + " bg-black text-white hover:bg-black/90 active:scale-[0.99]";
+      const inputBase = "w-full rounded-[16px] border border-neutral-300 px-4 py-3 focus:outline-none focus:ring-4 focus:ring-neutral-200 transition bg-white";
+
       return (
-        <span className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-sm ${tones[tone]}`}>{children}</span>
+        <main className={shell} style={{ fontFamily: "-apple-system, BlinkMacSystemFont, 'Pretendard Variable', 'SF Pro Text', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" }}>
+          <header className="sticky top-0 z-30 border-b border-neutral-200/60 bg-white/70 backdrop-blur supports-[backdrop-filter]:bg-white/50">
+            <div className={container + " flex items-center justify-between h-16"}>
+              <div className="flex items-center gap-2">
+                <div className="w-6 h-6 rounded-full qpilogo" style={{background: "conic-gradient(#232323 0deg, #232323 138.46deg, #234C93 138.46deg, #234C93 360deg)"}}/>
+                <span className="text-sm tracking-tight text-neutral-700">충곽 스터디 카페 예약</span>
+              </div>
+              <div className="text-xs text-neutral-500">Asia/Seoul · 매일 13:20~18:20 오픈</div>
+            </div>
+          </header>
+          
+          <section className={container + " pt-14 pb-10"}>
+            <div className="flex flex-col items-start gap-6">
+              <h1 className="text-4xl md:text-6xl leading-tight tracking-tight font-semibold">
+                충곽 <span className="inline-block bg-black text-white px-2 rounded-xl">스터디 카페</span>
+                <br/> 1층 언어실습실에서 만나요.
+              </h1>
+              <p className="text-neutral-600 text-lg md:text-xl font-semibold">
+                매일 13:20~18:20 선착순 <strong>15명</strong> 예약 · 당일 야간 자율학습시간 이용
+              </p>
+            </div>
+          </section>
+          
+          <section className={container + " pb-16"}>
+            <div className={glass + " p-6 md:p-8"}>
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div className="space-y-1">
+                  <div className="text-sm text-neutral-500">오늘 날짜</div>
+                  <div className="text-2xl font-medium">{formatYMD(now)}</div>
+                </div>
+                <div className="text-right">
+                  {isOpen ? (
+                    listLoading ? (
+                      <div className="inline-flex items-center gap-1 rounded-full border border-orange-600/20 bg-orange-50 pl-1 pr-2 py-1 text-orange-700 tabular-nums">
+                        <div className="w-6 h-6 rounded-full qpilogo" style={{background: `conic-gradient(oklch(70.5% 0.213 47.604) 0deg ${(1-msUntilClose/(5*3600000))*360}deg, oklch(90.1% 0.076 70.697) ${(1-msUntilClose/(5*3600000))*360}deg 360deg)`}}/>
+                        가져오는 중 / {timeLeftClosing()}
+                      </div>
+                    ) : (
+                      remaining==0 ? (
+                        <div className="inline-flex items-center gap-1 rounded-full border border-red-600/20 bg-red-50 pl-1 pr-2 py-1 text-red-700 tabular-nums">
+                          <div className="w-6 h-6 rounded-full qpilogo" style={{backgroundColor: "oklch(63.7% 0.237 25.331)"}}/>
+                          예약 조기 마감
+                        </div>
+                      ) : (
+                        <div className="inline-flex items-center gap-1 rounded-full border border-green-600/20 bg-green-50 pl-1 pr-2 py-1 text-green-700 tabular-nums">
+                          <div className="w-6 h-6 rounded-full qpilogo" style={{background: `conic-gradient(oklch(72.3% 0.219 149.579) 0deg ${(1-msUntilClose/(5*3600000))*360}deg, oklch(92.5% 0.084 155.995) ${(1-msUntilClose/(5*3600000))*360}deg 360deg)`}}/>
+                          예약 마감까지 {timeLeftClosing()}
+                        </div>
+                      )
+                    )
+                  ) : (
+                    <div className="inline-flex items-center gap-1 rounded-full border border-neutral-300 bg-neutral-50 pl-1 pr-2 py-1 text-neutral-700 tabular-nums">
+                      <div className="w-6 h-6 rounded-full qpilogo" style={{backgroundColor: "oklch(70.8% 0 0)"}}/>
+                      {`오픈까지 ${timeLeft()}`}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className="mt-4 w-full">
+                <div className="flex items-center justify-between text-sm text-neutral-600 mb-1">
+                  <span>예약 현황</span>
+                  {listLoading ? (
+                      <span className="font-semibold">.../{capacity}</span>
+                    ) : (
+                      remaining==0 ? (
+                        <span className="font-semibold">{capacity}/{capacity}(마감)</span>
+                      ) : (
+                        <span className="font-semibold">{capacity-remaining}/{capacity}</span>
+                      )
+                  )}
+                </div>
+                <div className="relative h-3 w-full overflow-hidden rounded-full bg-neutral-100">
+                  {isOpen ? (
+                    listLoading ? (
+                      <div
+                        className="absolute inset-y-0 left-0 rounded-full bg-orange-200 transition-[width]"
+                        style={{ width: `100%` }}
+                      />
+                    ) : (
+                      remaining==0 ? (
+                        <div
+                          className="absolute inset-y-0 left-0 rounded-full bg-red-500 transition-[width,background-color] duration-500"
+                          style={{ width: `100%` }}
+                        />
+                      ) : (
+                        <div
+                          className="absolute inset-y-0 left-0 rounded-full bg-green-500 transition-[width,background-color] duration-500"
+                          style={{ width: `${Math.min(100, Math.round((1 - remaining / capacity) * 100))}%` }}
+                        />
+                      )
+                    )
+                  ) : (
+                    listLoading ? (
+                      <div
+                        className="absolute inset-y-0 left-0 rounded-full bg-neutral-300 transition-[width] duration-500"
+                        style={{ width: `100%` }}
+                      />
+                    ) : (
+                      <div
+                        className="absolute inset-y-0 left-0 rounded-full bg-neutral-500 transition-[width,background-color] duration-500"
+                        style={{ width: `${Math.min(100, Math.round((1 - remaining / capacity) * 100))}%` }}
+                      />
+                    )
+                  )}
+                </div>
+              </div>
+
+              <form onSubmit={handleReserve} className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3">
+                <input
+                  className={inputBase}
+                  type="text"
+                  inputMode="numeric"
+                  placeholder="학번"
+                  value={studentId}
+                  onChange={(e) => setStudentId(e.target.value)}
+                  disabled={!isOpen || list.length >= capacity}
+                  aria-label="학번"
+                />
+                <input
+                  className={inputBase}
+                  type="text"
+                  placeholder="이름"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  disabled={!isOpen || list.length >= capacity}
+                  aria-label="이름"
+                />
+                <button
+                  className={btnPrimary}
+                  type="submit"
+                  disabled={!isOpen || list.length >= capacity}
+                >
+                  예약하기
+                </button>
+              </form>
+
+              {error && (
+                <div className="mt-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-red-700 text-sm">{error}</div>
+              )}
+              {ok && (
+                <div className="mt-4 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-emerald-700 text-sm">{ok}</div>
+              )}
+              
+              <div className="mt-10">
+                <div className="flex items-end justify-between">
+                  <h2 className="text-xl font-semibold tracking-tight">오늘의 예약 명단</h2>
+                  <div className="text-xs text-neutral-500">선착순 정렬 (최대 15명)</div>
+                </div>
+                {listLoading ? (
+                  <ol className="mt-4 divide-y divide-neutral-200 border border-neutral-200 rounded-2xl overflow-hidden">
+                      <li className="p-4 text-neutral-500 text-sm">로딩중</li>
+                  </ol>
+                ) : (
+                  <ol className="mt-4 divide-y divide-neutral-200 border border-neutral-200 rounded-2xl overflow-hidden">
+                      {list.length === 0 && (
+                        <li className="p-4 text-neutral-500 text-sm">아직 예약이 없어요. 13:20에 오픈됩니다.</li>
+                      )}
+                      {list.toReversed().map((r, idx) => (
+                        <li key={r.studentId} className="flex items-center justify-between p-4">
+                          <div className="flex items-center gap-4">
+                            <span className="inline-flex w-7 h-7 items-center justify-center rounded-full border border-neutral-300 text-sm">
+                              {list.length - idx}
+                            </span>
+                            <div>
+                              <div className="font-medium">{r.name}</div>
+                              <div className="text-xs text-neutral-500">학번 {maskId(r.studentId.toString())}</div>
+                            </div>
+                          </div>
+                          <div className="text-xs text-neutral-500">
+                            {new Date(r.date).toLocaleTimeString("ko-KR", { timeZone: "Asia/Seoul", hour: "2-digit", minute: "2-digit", second: "2-digit" })}
+                          </div>
+                        </li>
+                      ))}
+                  </ol>
+                )}
+              </div>
+            </div>
+          </section>
+        
+          <footer className="border-t border-neutral-200/60">
+            <div className={container + " py-10 text-sm text-neutral-500 flex flex-col md:flex-row gap-4 md:items-center md:justify-between"}>
+              <div>© {now.getFullYear()} 충곽 스터디 카페 예약 MADE BY QPI</div>
+              <div className="opacity-80">매일 13:20~18:20 오픈 · 당일 야간 자율학습 시간 이용 가능</div>
+            </div>
+          </footer>
+        </main>
       );
     }
+            
+    const root = ReactDOM.createRoot(document.getElementById("root"));
+          root.render(<StudyCafeReservation />);
+  </script>
+</body>
+</html>
 
+
+
+
+
+<!--
     function CapacityMeter({ current, capacity }) {
       const fill = Math.min(100, Math.round((current / capacity) * 100));
       return (
@@ -112,274 +392,4 @@
         </div>
       );
     }
-
-    function StudyCafeReservation() {
-      const [now, setNow] = useState(getSeoulNow());
-      useEffect(() => { const t = setInterval(() => setNow(getSeoulNow()), 1000); return () => clearInterval(t); }, []);
-
-      // 고정 오픈 (요청사항 반영). 시간 기반 제어 원하면 isOpen 계산으로 교체 가능.
-      const isOpen = true;
-
-      const [listLoading, setListLoading] = useState(true);
-      const [list, setList] = useState([]);
-      const [fetchErr, setFetchErr] = useState("");
-
-      useEffect(() => {
-        async function load() {
-          setFetchErr("");
-          try {
-            const res = await fetch(URL, { method: "GET" });
-            const txt = await res.text();
-            const arr = JSON.parse(txt).map((e) => ({ studentId: e[0], name: e[1], date: new Date(e[3]) }));
-            setList(arr);
-          } catch (e) {
-            setFetchErr("데이터를 불러오지 못했습니다. 새로고침해주세요.");
-          } finally {
-            setListLoading(false);
-          }
-        }
-        load();
-      }, []);
-
-      const capacity = 15;
-      const remaining = Math.max(0, capacity - list.length);
-
-      const [studentId, setStudentId] = useState("");
-      const [name, setName] = useState("");
-      const [status, setStatus] = useState({ type: "idle", msg: "" }); // idle | error | ok | loading
-
-      async function handleReserve(e) {
-        e.preventDefault();
-        if (!isOpen) {
-          setStatus({ type: "error", msg: "예약은 매일 13:20에 오픈됩니다." });
-          return;
-        }
-        if (!studentId.trim() || !name.trim()) {
-          setStatus({ type: "error", msg: "학번과 이름을 모두 입력해 주세요." });
-          return;
-        }
-        if (!/^\d{2,}$/.test(studentId.trim())) {
-          setStatus({ type: "error", msg: "학번은 2자리 이상의 숫자로 입력해 주세요." });
-          return;
-        }
-        setStatus({ type: "loading", msg: "예약 요청을 보내는 중..." });
-
-        try {
-          const body = JSON.stringify({ studentId: studentId.trim(), name: name.trim() });
-          const res = await fetch(URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body });
-          const txt = await res.text();
-
-          if (txt.startsWith("fail")) {
-            const msg = txt.substring(6).split("\n");
-            const reason = msg[0] || "예약에 실패했습니다.";
-            if (msg.length >= 2) {
-              try { setList(JSON.parse(msg[1]).map((e) => ({ studentId: e[0], name: e[1], date: new Date(e[3]) }))); } catch {}
-            }
-            setStatus({ type: "error", msg: reason });
-            return;
-          }
-
-          // 성공
-          const updated = JSON.parse(txt).map((e) => ({ studentId: e[0], name: e[1], date: new Date(e[3]) }));
-          setList(updated);
-          setStudentId("");
-          setName("");
-          setStatus({ type: "ok", msg: "예약이 완료되었습니다! 오늘 야간 자율학습 시간에 이용 가능합니다." });
-        } catch (error) {
-          setStatus({ type: "error", msg: "네트워크 오류가 발생했습니다. 다시 시도해 주세요." });
-        }
-      }
-
-      return (
-        <div>
-          {/* Top Bar */}
-          <header className="sticky top-0 z-40 border-b border-neutral-200/70 bg-white/70 backdrop-blur supports-[backdrop-filter]:bg-white/50">
-            <div className="mx-auto flex h-16 max-w-5xl items-center justify-between px-5">
-              <div className="flex items-center gap-2">
-                <div className="grid h-7 w-7 place-items-center rounded-full bg-gradient-to-br from-neutral-900 to-brand-500 text-white shadow-soft">
-                  <span className="text-[10px] font-semibold">CN
-                    <span className="opacity-80">SH</span>
-                  </span>
-                </div>
-                <span className="text-sm tracking-tight text-neutral-700">충곽 스터디 카페 예약</span>
-              </div>
-              <div className="flex items-center gap-2 text-xs text-neutral-500">
-                <span>Asia/Seoul</span>
-                <span className="text-neutral-300">•</span>
-                <span>매일 13:20 오픈</span>
-              </div>
-            </div>
-          </header>
-
-          {/* Hero */}
-          <section className="mx-auto max-w-5xl px-5 pt-12 pb-8">
-            <div className="flex flex-col items-start gap-5 animate-fadeUp">
-              <h1 className="text-4xl font-bold leading-[1.1] tracking-tight md:text-6xl">
-                충곽 <span className="rounded-xl bg-neutral-900 px-2 text-white">스터디 카페</span>
-                <br className="hidden md:block" />
-                <span className="mt-2 inline-block text-[0.9em] font-semibold text-neutral-700">1층 언어실습실에서 만나요.</span>
-              </h1>
-              <p className="text-lg font-medium text-neutral-600 md:text-xl">
-                매일 13:20 선착순 <strong className="font-semibold text-neutral-900">15명</strong> 예약 · 당일 야간 자율학습시간 이용
-              </p>
-            </div>
-          </section>
-
-          {/* Card */}
-          <main className="mx-auto max-w-5xl px-5 pb-20">
-            <div className="rounded-blob border border-neutral-200 bg-white/70 p-6 shadow-soft backdrop-blur md:p-8">
-              {/* Top row */}
-              <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                <div className="space-y-1">
-                  <div className="text-sm text-neutral-500">오늘 날짜</div>
-                  <div className="text-2xl font-medium">{formatYMD(now)}</div>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  {listLoading ? (
-                    <Badge tone="amber">
-                      <span className="relative inline-flex h-3 w-3 overflow-hidden rounded-full bg-amber-300/60 align-middle">
-                        <span className="absolute inset-0 animate-ping rounded-full bg-amber-400/70" />
-                      </span>
-                      가져오는 중
-                    </Badge>
-                  ) : remaining === 0 ? (
-                    <Badge tone="red">
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="-mt-px">
-                        <path d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 00.13 2.12A2 2 0 003.5 21h17a2 2 0 001.55-.79 2 2 0 00.13-2.12L13.71 3.86a2 2 0 00-3.42 0z" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
-                      </svg>
-                      예약 마감
-                    </Badge>
-                  ) : (
-                    <Badge tone="green">
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="-mt-px">
-                        <path d="M20 7l-9 9-5-5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
-                      </svg>
-                      예약 가능 {remaining}석 남음
-                    </Badge>
-                  )}
-                </div>
-              </div>
-
-              {/* Meter */}
-              <div className="mt-6">
-                <CapacityMeter current={Math.min(capacity, capacity - remaining)} capacity={capacity} />
-              </div>
-
-              {/* Form & List */}
-              <div className="mt-8 grid gap-8 md:grid-cols-5">
-                {/* Form */}
-                <form className="md:col-span-2 space-y-3" onSubmit={handleReserve}>
-                  <label className="block text-sm font-medium text-neutral-700">학번</label>
-                  <div className="group relative">
-                    <input
-                      className="w-full rounded-2xl border border-neutral-300 bg-white px-4 py-3 pe-10 outline-none transition placeholder:text-neutral-400 focus:border-brand-500 focus:ring-4 focus:ring-brand-200"
-                      placeholder="예: 11"
-                      inputMode="numeric"
-                      value={studentId}
-                      onChange={(e) => setStudentId(e.target.value.replace(/[^0-9]/g, ''))}
-                    />
-                    <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 group-focus-within:text-brand-500">#</span>
-                  </div>
-
-                  <label className="mt-4 block text-sm font-medium text-neutral-700">이름</label>
-                  <div className="group relative">
-                    <input
-                      className="w-full rounded-2xl border border-neutral-300 bg-white px-4 py-3 pe-10 outline-none transition placeholder:text-neutral-400 focus:border-brand-500 focus:ring-4 focus:ring-brand-200"
-                      placeholder="예: 김철수"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                    />
-                    <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 group-focus-within:text-brand-500">🙂</span>
-                  </div>
-
-                  <button
-                    type="submit"
-                    disabled={status.type === "loading" || remaining === 0}
-                    className="group mt-3 inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-neutral-900 px-5 py-3 font-medium text-white shadow-soft transition active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60 hover:bg-neutral-800"
-                  >
-                    {status.type === "loading" ? (
-                      <>
-                        <span className="inline-flex h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" />
-                        처리 중...
-                      </>
-                    ) : (
-                      <>
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="opacity-90 transition group-hover:translate-x-0.5">
-                          <path d="M12 5v14m-7-7h14" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-                        </svg>
-                        예약하기
-                      </>
-                    )}
-                  </button>
-
-                  {status.type === "error" && (
-                    <p className="rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{status.msg}</p>
-                  )}
-                  {status.type === "ok" && (
-                    <p className="rounded-xl border border-green-200 bg-green-50 px-3 py-2 text-sm text-green-700">{status.msg}</p>
-                  )}
-                </form>
-
-                {/* List */}
-                <div className="md:col-span-3">
-                  <div className="mb-2 flex items-center justify-between">
-                    <h2 className="text-base font-semibold text-neutral-800">오늘의 예약자</h2>
-                    {!listLoading && (
-                      <span className="text-sm text-neutral-500">총 {list.length}명</span>
-                    )}
-                  </div>
-
-                  <div className="overflow-hidden rounded-2xl border border-neutral-200">
-                    {listLoading ? (
-                      <div className="divide-y divide-neutral-200">
-                        {[...Array(5)].map((_, i) => (
-                          <div key={i} className="relative flex items-center justify-between px-4 py-3">
-                            <div className="h-4 w-24 rounded bg-neutral-200/60"></div>
-                            <div className="h-4 w-32 rounded bg-neutral-200/60"></div>
-                            <div className="h-4 w-16 rounded bg-neutral-200/60"></div>
-                            <span className="absolute inset-0 -translate-x-full animate-shimmer bg-gradient-to-r from-transparent via-white/60 to-transparent" />
-                          </div>
-                        ))}
-                      </div>
-                    ) : list.length === 0 ? (
-                      <div className="px-4 py-12 text-center text-neutral-500">아직 예약이 없습니다. 첫 예약의 주인공이 되어주세요!</div>
-                    ) : (
-                      <ul className="divide-y divide-neutral-200">
-                        {list.map((e, idx) => (
-                          <li key={`${e.studentId}-${idx}`} className="flex items-center justify-between px-4 py-3 transition hover:bg-neutral-50">
-                            <div className="flex items-center gap-3">
-                              <span className="grid h-8 w-8 place-items-center rounded-full bg-brand-100 text-sm font-semibold text-brand-600">{idx + 1}</span>
-                              <div>
-                                <div className="font-medium">{e.name}</div>
-                                <div className="text-xs text-neutral-500">{MaskId(e.studentId.toString())}</div>
-                              </div>
-                            </div>
-                            <div className="text-sm text-neutral-500">{e.date.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}</div>
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </div>
-
-                  {fetchErr && (
-                    <p className="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">{fetchErr}</p>
-                  )}
-                </div>
-              </div>
-            </div>
-          </main>
-
-          {/* Footer */}
-          <footer className="mx-auto max-w-5xl px-5 pb-10 text-center text-sm text-neutral-500">
-            <p>© {new Date().getFullYear()} 충남과학고 스터디 카페 · 제작 도움: 예약 자동화·UI 개선</p>
-          </footer>
-        </div>
-      );
-    }
-
-    const root = ReactDOM.createRoot(document.getElementById("root"));
-    root.render(<StudyCafeReservation />);
-  </script>
-</body>
-</html>
+      -->

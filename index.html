@@ -23,6 +23,7 @@
   
   <script type="text/babel">
     const { useEffect, useMemo, useRef, useState } = React;
+    const URL = "https://script.google.com/macros/s/AKfycbzzETF3hS8aJ5CgVEDFnLHOVRE158PzsBiEoIxAqr4lr9DTnfdaMjzeUBFH76putG3BDw/exec"
     
     function StudyCafeReservation() {
       const getSeoulNow = () => new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Seoul" }));
@@ -47,31 +48,25 @@
         return () => clearInterval(t);
       }, []);
 
-      const [list, setList] = useState(() => {
-        try {
-          const raw = localStorage.getItem(todayKey);
-          return raw ? JSON.parse(raw) : [];
-        } catch (e) {
-          return [];
-        }
-      });
+      const [listLoading, setListLoading] = useState(true);
+      const [list, setList] = useState([]);
 
-      const prevKeyRef = useRef(todayKey);
       useEffect(() => {
-        if (prevKeyRef.current !== todayKey) {
-          prevKeyRef.current = todayKey;
+        (async () => {
           try {
-            const raw = localStorage.getItem(todayKey);
-            setList(raw ? JSON.parse(raw) : []);
+            return await fetch(URL, {
+              method: "GET"
+            }).then(response => response.text())
+            .catch(error => console.error('Error:', error));
           } catch (e) {
-            setList([]);
+            return [];
           }
-        }
-      }, [todayKey]);
-
-      useEffect(() => {
-        localStorage.setItem(todayKey, JSON.stringify(list));
-      }, [list, todayKey]);
+        })().then((data) => {
+          setList(JSON.parse(data).map((e) => ({studentId:e[0], name:e[1], date: new Date(e[3])})));
+          setListLoading(false);
+          console.log("init start")
+        })
+      }, [])
 
       const [studentId, setStudentId] = useState("");
       const [name, setName] = useState("");
@@ -111,9 +106,9 @@
         const entry = {
           studentId: studentId.trim(),
           name: name.trim(),
-          ts: getSeoulNow().toISOString(),
+          date: getSeoulNow()
         };
-        const next = [...list, entry].sort((a, b) => new Date(a.ts) - new Date(b.ts));
+        const next = [...list, entry];
         setList(next);
         setOk("예약이 완료되었습니다! 오늘 야간 자율학습 시간에 이용 가능합니다.");
         setStudentId("");
@@ -124,7 +119,7 @@
           name: name.trim(),
         };
         
-        fetch("https://script.google.com/macros/s/AKfycbwTugk146zAqHv0f5lUh_88nDRaC_AfCljxKRqZRrKrOF2ul5G7JL5y0iSCWmTzgtmfJQ/exec", {
+        fetch(URL, {
           method: "POST",
           headers: {
             "Content-Type": "text/plain;charset=utf-8",
@@ -134,6 +129,16 @@
         .then(result => console.log(result))
         .catch(error => console.error('Error:', error));
       }
+
+      const maskId = (id) => (id.length <= 2 ? id : `${id.slice(0, 2)}••••`);
+      const timeLeft = () => {
+        const ms = msUntilOpen;
+        const s = Math.floor(ms / 1000);
+        const hh = String(Math.floor(s / 3600)).padStart(2, "0");
+        const mm = String(Math.floor((s % 3600) / 60)).padStart(2, "0");
+        const ss = String(s % 60).padStart(2, "0");
+        return `${hh}:${mm}:${ss}`;
+      };
 
       const shell = "min-h-screen bg-white text-neutral-900";
       const container = "max-w-3xl mx-auto px-6";
@@ -190,7 +195,7 @@
                 </div>
                 <div className="rounded-2xl border border-neutral-200 p-4">
                   <div className="text-sm text-neutral-500">잔여 좌석</div>
-                  <div className="text-lg font-medium">{remaining} / {capacity}</div>
+                  <div className="text-lg font-medium">{listLoading ? '...' : remaining} / {capacity}</div>
                 </div>
                 <div className="rounded-2xl border border-neutral-200 p-4">
                   <div className="text-sm text-neutral-500">상태</div>
@@ -233,7 +238,40 @@
               {ok && (
                 <div className="mt-4 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-emerald-700 text-sm">{ok}</div>
               )}
-
+              
+              <div className="mt-10">
+                <div className="flex items-end justify-between">
+                  <h2 className="text-xl font-semibold tracking-tight">오늘의 예약 명단</h2>
+                  <div className="text-xs text-neutral-500">선착순 정렬 (최대 15명)</div>
+                </div>
+                {listLoading ? (
+                  <ol className="mt-4 divide-y divide-neutral-200 border border-neutral-200 rounded-2xl overflow-hidden">
+                      <li className="p-4 text-neutral-500 text-sm">로딩중</li>
+                  </ol>
+                ) : (
+                  <ol className="mt-4 divide-y divide-neutral-200 border border-neutral-200 rounded-2xl overflow-hidden">
+                      {list.length === 0 && (
+                        <li className="p-4 text-neutral-500 text-sm">아직 예약이 없어요. 14:00에 오픈됩니다.</li>
+                      )}
+                      {list.map((r, idx) => (
+                        <li key={r.studentId} className="flex items-center justify-between p-4">
+                          <div className="flex items-center gap-4">
+                            <span className="inline-flex w-7 h-7 items-center justify-center rounded-full border border-neutral-300 text-sm">
+                              {idx + 1}
+                            </span>
+                            <div>
+                              <div className="font-medium">{r.name}</div>
+                              <div className="text-xs text-neutral-500">학번 {maskId(r.studentId.toString())}</div>
+                            </div>
+                          </div>
+                          <div className="text-xs text-neutral-500">
+                            {new Date(r.date).toLocaleTimeString("ko-KR", { timeZone: "Asia/Seoul", hour: "2-digit", minute: "2-digit", second: "2-digit" })}
+                          </div>
+                        </li>
+                      ))}
+                  </ol>
+                )}
+              </div>
             </div>
           </section>
         
@@ -248,7 +286,7 @@
     }
             
     const root = ReactDOM.createRoot(document.getElementById("root"));
-    root.render(<StudyCafeReservation />);
+          root.render(<StudyCafeReservation />);
   </script>
 </body>
 </html>

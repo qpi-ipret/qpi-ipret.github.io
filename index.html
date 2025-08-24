@@ -29,7 +29,7 @@
   
   <script type="text/babel">
     const { useEffect, useMemo, useRef, useState } = React;
-    const URL = "https://script.google.com/macros/s/AKfycbxDCvwXt8RJfLCob4cZevD6b0JhdlGf-9u4Zs1SAyiOb_xviyIJQ-6ab3bgUvPbr3oQ7Q/exec" // version 15
+    const URL = "https://script.google.com/macros/s/AKfycbzreOJcyitgn7MN_7jWyQByG1bPLbQYD7RLQqtTVQrOsUayRZwQPHCttFd_6lZhdrZ2HA/exec" // version 18
     
     function StudyCafeReservation() {
       const getSeoulNow = () => new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Seoul" }));
@@ -41,16 +41,22 @@
       };
 
       const [now, setNow] = useState(getSeoulNow());
-      const openingTime = useMemo(() => {
+      const closingTime = useMemo(() => {
         const d = getSeoulNow();
-        d.setHours(14, 0, 0, 0); // 14:00 고정
+        d.setHours(18, 20, 0, 0); // 18:20 고정
         return d;
       }, [now]);
+      const msUntilClose = Math.max(0, closingTime - now);
 
-      const isOpen = true;  // 예약을 항상 받을 수 있도록
+      const openingTime = useMemo(() => {
+        const d = getSeoulNow();
+        d.setHours(13, 20, 0, 0); // 13:20 고정
+        if (msUntilClose===0) d.setDate(d.getDate() + 1);
+        return d;
+      }, [now]);
+      const msUntilOpen = Math.max(0, openingTime - now);
 
-      //const msUntilOpen = Math.max(0, openingTime - now);
-      //const isOpen = msUntilOpen === 0;
+      const isOpen = (msUntilOpen === 0 && msUntilClose !== 0);
 
       useEffect(() => {
         const t = setInterval(() => setNow(getSeoulNow()), 1000);
@@ -91,7 +97,7 @@
         setOk("");
         
         if (!isOpen) {
-          setError("예약은 매일 14:00에 오픈됩니다.");
+          setError("예약은 매일 13:20에서 18:20까지 오픈됩니다.");
           return;
         }
         if (!studentId.trim() || !name.trim()) {
@@ -149,6 +155,14 @@
         const ss = String(s % 60).padStart(2, "0");
         return `${hh}:${mm}:${ss}`;
       };
+      const timeLeftClosing = () => {
+        const ms = msUntilClose;
+        const s = Math.floor(ms / 1000);
+        const hh = String(Math.floor(s / 3600)).padStart(2, "0");
+        const mm = String(Math.floor((s % 3600) / 60)).padStart(2, "0");
+        const ss = String(s % 60).padStart(2, "0");
+        return `${hh}:${mm}:${ss}`;
+      };
 
       const shell = "min-h-screen bg-white text-neutral-900";
       const container = "max-w-3xl mx-auto px-6";
@@ -165,7 +179,7 @@
                 <div className="w-6 h-6 rounded-full qpilogo" style={{background: "conic-gradient(#232323 0deg, #232323 138.46deg, #234C93 138.46deg, #234C93 360deg)"}}/>
                 <span className="text-sm tracking-tight text-neutral-700">충곽 스터디 카페 예약</span>
               </div>
-              <div className="text-xs text-neutral-500">Asia/Seoul · 매일 14:00 오픈</div>
+              <div className="text-xs text-neutral-500">Asia/Seoul · 매일 13:20~18:20 오픈</div>
             </div>
           </header>
           
@@ -175,8 +189,8 @@
                 충곽 <span className="inline-block bg-black text-white px-2 rounded-xl">스터디 카페</span>
                 <br/> 1층 언어실습실에서 만나요.
               </h1>
-              <p className="text-neutral-600 text-lg md:text-xl">
-                매일 14:00 선착순 <strong>15명</strong> 예약 · 당일 야간 자율학습시간 이용
+              <p className="text-neutral-600 text-lg md:text-xl font-semibold">
+                매일 13:20~18:20 선착순 <strong>15명</strong> 예약 · 당일 야간 자율학습시간 이용
               </p>
             </div>
           </section>
@@ -191,25 +205,25 @@
                 <div className="text-right">
                   {isOpen ? (
                     listLoading ? (
-                      <div className="inline-flex items-center gap-1 rounded-full border border-orange-600/20 bg-orange-50 pl-1 pr-2 py-1 text-orange-700">
+                      <div className="inline-flex items-center gap-1 rounded-full border border-orange-600/20 bg-orange-50 pl-1 pr-2 py-1 text-orange-700 tabular-nums">
                         <div className="w-6 h-6 rounded-full qpilogo" style={{backgroundColor: "oklch(70.5% 0.213 47.604)"}}/>
-                        가져오는 중
+                        가져오는 중 / {timeLeftClosing()}
                       </div>
                     ) : (
                       remaining==0 ? (
-                        <div className="inline-flex items-center gap-1 rounded-full border border-red-600/20 bg-red-50 pl-1 pr-2 py-1 text-red-700">
+                        <div className="inline-flex items-center gap-1 rounded-full border border-red-600/20 bg-red-50 pl-1 pr-2 py-1 text-red-700 tabular-nums">
                           <div className="w-6 h-6 rounded-full qpilogo" style={{backgroundColor: "oklch(63.7% 0.237 25.331)"}}/>
-                          예약 마감
+                          예약 조기 마감
                         </div>
                       ) : (
-                        <div className="inline-flex items-center gap-1 rounded-full border border-green-600/20 bg-green-50 pl-1 pr-2 py-1 text-green-700">
+                        <div className="inline-flex items-center gap-1 rounded-full border border-green-600/20 bg-green-50 pl-1 pr-2 py-1 text-green-700 tabular-nums">
                           <div className="w-6 h-6 rounded-full qpilogo" style={{background: `conic-gradient(oklch(72.3% 0.219 149.579) 0deg ${(capacity-remaining)*360/capacity}deg, oklch(92.5% 0.084 155.995) ${(capacity-remaining)*360/capacity}deg 360deg)`}}/>
-                          예약 가능
+                          예약 마감까지 {timeLeftClosing()}
                         </div>
                       )
                     )
                   ) : (
-                    <div className="inline-flex items-center gap-1 rounded-full border border-neutral-300 bg-neutral-50 pl-1 pr-2 py-1 text-neutral-700">
+                    <div className="inline-flex items-center gap-1 rounded-full border border-neutral-300 bg-neutral-50 pl-1 pr-2 py-1 text-neutral-700 tabular-nums">
                       <div className="w-6 h-6 rounded-full qpilogo" style={{backgroundColor: "oklch(70.8% 0 0)"}}/>
                       {`오픈까지 ${timeLeft()}`}
                     </div>
@@ -280,7 +294,7 @@
                 ) : (
                   <ol className="mt-4 divide-y divide-neutral-200 border border-neutral-200 rounded-2xl overflow-hidden">
                       {list.length === 0 && (
-                        <li className="p-4 text-neutral-500 text-sm">아직 예약이 없어요. 14:00에 오픈됩니다.</li>
+                        <li className="p-4 text-neutral-500 text-sm">아직 예약이 없어요. 13:20에 오픈됩니다.</li>
                       )}
                       {list.toReversed().map((r, idx) => (
                         <li key={r.studentId} className="flex items-center justify-between p-4">
@@ -307,7 +321,7 @@
           <footer className="border-t border-neutral-200/60">
             <div className={container + " py-10 text-sm text-neutral-500 flex flex-col md:flex-row gap-4 md:items-center md:justify-between"}>
               <div>© {now.getFullYear()} 충곽 스터디 카페 예약 MADE BY QPI</div>
-              <div className="opacity-80">매일 14:00 오픈 · 당일 야간 자율학습 시간 이용 가능</div>
+              <div className="opacity-80">매일 13:20~18:20 오픈 · 당일 야간 자율학습 시간 이용 가능</div>
             </div>
           </footer>
         </main>

@@ -23,7 +23,7 @@
   
   <script type="text/babel">
     const { useEffect, useMemo, useRef, useState } = React;
-    const URL = "https://script.google.com/macros/s/AKfycbzDuVkU2uFEue26DZ3RdRDkz1ZEVP-4p3t91RkZWFQ-io4oYUjEIugx1ueTEWjcsT-7iw/exec" // version 12
+    const URL = "https://script.google.com/macros/s/AKfycbyvr2pZewF0TE2QnJUKbbK94q-FrrESmsRoqZXcxVQRQVk94zToCJh8nceJuZHBJDkzZA/exec" // version 13
     
     function StudyCafeReservation() {
       const getSeoulNow = () => new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Seoul" }));
@@ -119,7 +119,10 @@
         }).then(response => response.text())
         .then(result => {
           if (result.startsWith("fail")) {
-            setError(result.substring(6)); // fail: [실패사유]
+            msg = result.substring(6).split("\n");
+            setError(msg[0]); // fail: [실패사유]
+            if (msg.length < 2) return;
+            setList(JSON.parse(msg[1]).map((e) => ({studentId:e[0], name:e[1], date: new Date(e[3])})));
             return;
           }
           setList(JSON.parse(result).map((e) => ({studentId:e[0], name:e[1], date: new Date(e[3])})));

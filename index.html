@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko" class="dark:bg-neutral-900">
+<html lang="ko" class="dark:bg-[#232323]">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -199,16 +199,16 @@
         return `${hh}:${mm}:${ss}`;
       };
 
-      const shell = "min-h-screen bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100";
+      const shell = "min-h-screen bg-white dark:bg-[#232323] text-neutral-900 dark:text-neutral-100";
       const container = "max-w-3xl mx-auto px-6";
-      const glass = "backdrop-blur-xl bg-white/70 dark:bg-neutral-900/70 border border-neutral-200 dark:border-neutral-700 rounded-[42px] shadow-lg";
+      const glass = "backdrop-blur-xl bg-white/70 dark:bg-[#232323]/70 border border-neutral-200 dark:border-neutral-700 rounded-[42px] shadow-lg";
       const btnBase = "rounded-[16px] px-5 py-3 font-medium transition disabled:opacity-50 disabled:cursor-not-allowed";
       const btnPrimary = btnBase + " bg-black text-white dark:bg-neutral-50 dark:text-neutral-950 hover:bg-black/90 hover:dark:bg-neutral-50/90 active:scale-[0.99]";
       const inputBase = "w-full rounded-[16px] border border-neutral-300 dark:border-neutral-600 px-4 py-3 focus:outline-none focus:ring-4 focus:ring-neutral-200 transition bg-white dark:bg-neutral-950";
 
       return (
         <main className={shell} style={{ fontFamily: "-apple-system, BlinkMacSystemFont, 'Pretendard Variable', 'SF Pro Text', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" }}>
-          <header className="sticky top-0 z-30 border-b border-neutral-200/60 dark:border-neutral-700/60 bg-white/70 dark:bg-neutral-900/70 backdrop-blur supports-[backdrop-filter]:bg-white/50">
+          <header className="sticky top-0 z-30 border-b border-neutral-200/60 dark:border-neutral-700/60 bg-white/70 dark:bg-[#232323]/70 backdrop-blur supports-[backdrop-filter]:bg-white/50">
             <div className={container + " flex items-center justify-between h-16"}>
               <div className="flex items-center gap-2">
                 <div className="w-6 h-6 rounded-full circle qpilogo" style={{background: "conic-gradient(var(--qpi-color) 0deg 138.46deg, #234C93 138.46deg 360deg)"}}/>
@@ -258,7 +258,7 @@
                       )
                     )
                   ) : (
-                    <div className="inline-flex items-center gap-1 rounded-full border border-neutral-300 bg-neutral-50 dark:bg-neutral-900 pl-1 pr-2 py-1 text-neutral-700 dark:text-neutral-400 tabular-nums">
+                    <div className="inline-flex items-center gap-1 rounded-full border border-neutral-300 bg-neutral-50 dark:bg-[#232323] pl-1 pr-2 py-1 text-neutral-700 dark:text-neutral-400 tabular-nums">
                       <div className="w-6 h-6 rounded-full circle circle-gray" style={{backgroundColor: "var(--color-fg)"}}/>
                       {`오픈까지 ${timeLeft()}`}
                     </div>

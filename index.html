@@ -119,7 +119,8 @@
         }).then(response => response.text())
         .then(result => {
           if (result.startsWith("fail")) {
-            msg = result.substring(6).split("\n");
+            setError(result);
+            let msg = result.substring(6).split("\n");
             setError(msg[0]); // fail: [실패사유]
             if (msg.length < 2) return;
             setList(JSON.parse(msg[1]).map((e) => ({studentId:e[0], name:e[1], date: new Date(e[3])})));

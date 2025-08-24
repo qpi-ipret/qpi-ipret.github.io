@@ -29,7 +29,8 @@
   
   <script type="text/babel">
     const { useEffect, useMemo, useRef, useState } = React;
-    const URL = "https://script.google.com/macros/s/AKfycbzreOJcyitgn7MN_7jWyQByG1bPLbQYD7RLQqtTVQrOsUayRZwQPHCttFd_6lZhdrZ2HA/exec" // version 18
+    //const URL = "https://script.google.com/macros/s/AKfycbzreOJcyitgn7MN_7jWyQByG1bPLbQYD7RLQqtTVQrOsUayRZwQPHCttFd_6lZhdrZ2HA/exec" // version 18
+    const URL = "https://script.google.com/macros/s/AKfycbylEuuIAjPkxHAks749tvC8x0z9SJVf1k5RMM9ZCiiusBLTRgHruRQlnYoXMM6iFaSmkQ/exec" // TEST
     
     function StudyCafeReservation() {
       const getSeoulNow = () => new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Seoul" }));
@@ -43,7 +44,8 @@
       const [now, setNow] = useState(getSeoulNow());
       const closingTime = useMemo(() => {
         const d = getSeoulNow();
-        d.setHours(18, 20, 0, 0); // 18:20 고정
+        //d.setHours(18, 20, 0, 0); // 18:20 고정
+        d.setHours(23, 20, 0, 0); // 18:20 고정
         return d;
       }, [now]);
       const msUntilClose = Math.max(0, closingTime - now);

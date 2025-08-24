@@ -23,7 +23,7 @@
   
   <script type="text/babel">
     const { useEffect, useMemo, useRef, useState } = React;
-    const URL = "https://script.google.com/macros/s/AKfycbzzETF3hS8aJ5CgVEDFnLHOVRE158PzsBiEoIxAqr4lr9DTnfdaMjzeUBFH76putG3BDw/exec"
+    const URL = "https://script.google.com/macros/s/AKfycbyYNC6MhB7PCn1wkK1xlMwId6t189EZKjxtOIv4wuConMNnnYvSn5Ibtt-JQKxWMcLI9A/exec" // version 9
     
     function StudyCafeReservation() {
       const getSeoulNow = () => new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Seoul" }));
@@ -90,29 +90,17 @@
           return;
         }
         if (!/^\d{2,}$/.test(studentId.trim())) {
-          setError("학번은 숫자로 입력해 주세요.");
+          setError("학번은 2자리 이상의 숫자로 입력해 주세요.");
           return;
         }
-        if (list.length >= capacity) {
-          setError("오늘 예약이 마감되었습니다.");
-          return;
-        }
-        const exists = list.some((r) => r.studentId === studentId.trim());
-        if (exists) {
-          setError("해당 학번으로 이미 예약되었습니다.");
-          return;
-        }
+
+        setError("예약 요청을 보냈습니다. 잠시 기다려 주세요...")
         
         const entry = {
           studentId: studentId.trim(),
           name: name.trim(),
           date: getSeoulNow()
         };
-        const next = [...list, entry];
-        setList(next);
-        setOk("예약이 완료되었습니다! 오늘 야간 자율학습 시간에 이용 가능합니다.");
-        setStudentId("");
-        setName("");
         
         const data = {
           studentId: studentId.trim(),
@@ -126,7 +114,17 @@
           },
           body: JSON.stringify(data),
         }).then(response => response.text())
-        .then(result => console.log(result))
+        .then(result => {
+          if (result.startsWith("fail")) {
+            setError(result.substring(6)); // fail: [실패사유]
+            return;
+          }
+          setList([...list, entry]);
+          setStudentId("");
+          setName("");
+          setError("");
+          setOk("예약이 완료되었습니다! 오늘 야간 자율학습 시간에 이용 가능합니다.");
+        })
         .catch(error => console.error('Error:', error));
       }
 
@@ -253,11 +251,11 @@
                       {list.length === 0 && (
                         <li className="p-4 text-neutral-500 text-sm">아직 예약이 없어요. 14:00에 오픈됩니다.</li>
                       )}
-                      {list.map((r, idx) => (
+                      {list.toReversed().map((r, idx) => (
                         <li key={r.studentId} className="flex items-center justify-between p-4">
                           <div className="flex items-center gap-4">
                             <span className="inline-flex w-7 h-7 items-center justify-center rounded-full border border-neutral-300 text-sm">
-                              {idx + 1}
+                              {list.length - idx}
                             </span>
                             <div>
                               <div className="font-medium">{r.name}</div>

@@ -23,7 +23,7 @@
   
   <script type="text/babel">
     const { useEffect, useMemo, useRef, useState } = React;
-    const URL = "https://script.google.com/macros/s/AKfycbyYNC6MhB7PCn1wkK1xlMwId6t189EZKjxtOIv4wuConMNnnYvSn5Ibtt-JQKxWMcLI9A/exec" // version 9
+    const URL = "https://script.google.com/macros/s/AKfycbwdrdVL2P90XNQkEuFS2voC3m7K-gPm1Rj4FowEPwbEOwPxGAlSl6Ljk7Ck8tBt19hwUw/exec" // version 10
     
     function StudyCafeReservation() {
       const getSeoulNow = () => new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Seoul" }));
@@ -122,7 +122,7 @@
             setError(result.substring(6)); // fail: [실패사유]
             return;
           }
-          setList([...list, entry]);
+          setList(JSON.parse(result).map((e) => ({studentId:e[0], name:e[1], date: new Date(e[3])})));
           setStudentId("");
           setName("");
           setError("");
@@ -195,7 +195,7 @@
                       ) : (
                         <div className="inline-flex items-center gap-2 rounded-full border border-green-600/20 bg-green-50 px-3 py-1 text-green-700">
                           <span className="w-2 h-2 rounded-full bg-green-500 inline-block" />
-                          예약 오픈
+                          예약 가능
                         </div>
                       )
                     )

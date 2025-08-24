@@ -69,7 +69,9 @@
       const [listLoading, setListLoading] = useState(true);
       const [list, setList] = useState([]);
 
+      const [reload, setReload] = useState(true);
       useEffect(() => {
+        if (!reload) return;
         (async () => {
           try {
             return await fetch(URL, {
@@ -125,6 +127,7 @@
           name: name.trim(),
         };
         
+        setReload(false);
         fetch(URL, {
           method: "POST",
           headers: {
@@ -133,6 +136,7 @@
           body: JSON.stringify(data),
         }).then(response => response.text())
         .then(result => {
+          setReload(true);
           if (result.startsWith("fail")) {
             let msg = result.substring(6).split("\n");
             setError(msg[0]); // fail: [실패사유]

@@ -20,6 +20,7 @@
   <script src="https://accounts.google.com/gsi/client" async defer></script>
   <style>
     @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css');
+    @import url('https://fonts.cdnfonts.com/css/br-cobane');
     html, body { background: white; }
     
     /* bugfix */
@@ -80,6 +81,9 @@
     }
     .qpilogo {
       --qpi-color: #232323;
+    }
+    .font-br-cobane {
+      font family: 'BR Cobane', sans-serif;
     }
     @media screen and (prefers-color-scheme: dark) {
       .circle-green {
@@ -537,7 +541,7 @@
 
           <footer className="border-t border-neutral-200/60 dark:border-neutral-700/60">
             <div className={container + " py-10 text-sm text-neutral-500 flex flex-col md:flex-row gap-4 md:items-center md:justify-between"}>
-              <div>© {now.getFullYear()} 충곽 스터디 카페 예약 MADE BY QPI</div>
+              <div>© {now.getFullYear()} 충곽 스터디 카페 예약 <span className="font-br-cobane">BY QPI</span></div>
               <div className="opacity-80">매일 13:20~18:20 오픈 · 당일 야간 자율학습 시간 이용 가능</div>
             </div>
           </footer>

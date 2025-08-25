@@ -120,7 +120,7 @@
                 data-width="200">
             </div>
             <div id="login-mockup">
-              <img class="pfp" />
+              <img class="pfp" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAAAAAA6fptVAAAACklEQVQIHWM4AwAAzgDNUwEBJAAAAABJRU5ErkJggg=="/>
             </div>
           </div>
         </div>
@@ -134,6 +134,8 @@
 
     async function handleCredentialResponse(response) {
       const idToken = response.credential;
+      $(".g_id_signin").css("visibility", "hidden");
+      $("#login-mockup").css("display", "flex");
       const res = await fetch(AUTH_URL, {
         method: "POST",
         headers: { "Content-Type": "text/plain;charset=utf-8" },
@@ -145,15 +147,13 @@
         console.error(`fail: ${JSON.stringify(data)}`);
         return;
       }
-      $(".g_id_signin").css("visibility", "hidden");
-      $("#login-mockup").css("display", "flex");
       $(".pfp").attr("src",data.payload.picture);
       GOOGLE_SUB = data.payload.sub;
     }
   </script>
   <script type="text/babel">
     const { useEffect, useMemo, useRef, useState } = React;
-    const URL = "https://script.google.com/macros/s/AKfycbz3JV-VrezkrUbchukBIPaW5zTnlk7k0vHL8PJ7eKw-3TDezoZniMkx47Oni-aecSWaZg/exec" // version 21
+    const URL = "https://script.google.com/macros/s/AKfycbzgIzLss6zMCyAF6RXqz2B47vJCE7x2sa4ZCLxuyUI0l0TqlfEyT4N3aw6gdXs53XoAnA/exec" // version 23
     const AUTH_URL = "https://script.google.com/macros/s/AKfycbxWWGQbwf7XTRf67T5MIqmL0WY0064-__165ukUr7cPn27NsFV9ipt7YJ3UIJagKZba9g/exec" // login version 2
     
     function StudyCafeReservation() {
@@ -193,8 +193,11 @@
       const [list, setList] = useState([]);
 
       const [reload, setReload] = useState(true);
+      const [lastReload, setLastReload] = useState(new Date(0));
       useEffect(() => {
         if (!reload) return;
+        if (getSeoulNow()-lastReload < 1000) return;
+        setLastReload(getSeoulNow());
         (async () => {
           try {
             return await fetch(URL, {
@@ -210,11 +213,10 @@
           setListLoading(false);
           console.log("init start")
         })
-      }, [])
+      })
 
       const [studentId, setStudentId] = useState("");
       const [name, setName] = useState("");
-      const [pw, setPW] = useState("");
       const [error, setError] = useState("");
       const [ok, setOk] = useState("");
 
@@ -226,6 +228,11 @@
         setError("");
         setOk("");
         
+        if (GOOGLE_SUB == null) {
+          setError("우상단의 버튼을 눌러 구글 계정으로 로그인하세요.");
+          return;
+        }
+
         if (!isOpen) {
           setError("예약은 매일 13:20에서 18:20까지 오픈됩니다.");
           return;
@@ -244,7 +251,7 @@
         const data = {
           studentId: studentId.trim(),
           name: name.trim(),
-          pw: pw.trim()
+          sub: GOOGLE_SUB
         };
         
         setReload(false);
@@ -268,7 +275,6 @@
           setList(JSON.parse(result).map((e) => ({studentId:e[0], name:e[1], date: new Date(e[3])})));
           setStudentId("");
           setName("");
-          setPW("");
           setError("");
           setOk("예약이 완료되었습니다! 오늘 야간 자율학습 시간에 이용 가능합니다.");
         })
@@ -276,16 +282,18 @@
       }
 
       const handleDeletion = (key) => {
-        let pw_input = prompt("비밀번호를 입력하세요.");
-        if (pw_input==null) return;
-
+        if (GOOGLE_SUB == null) {
+          setError("우상단의 버튼을 눌러 구글 계정으로 로그인하세요.");
+          return;
+        }
+        
         setError("취소 요청을 보냈습니다. 잠시 기다려 주세요...");
         setOk("");
         
         const data = {
           studentId: "DELETE",
           key: key,
-          pw: pw_input.trim()
+          sub: GOOGLE_SUB
         };
         
         setReload(false);
@@ -436,7 +444,7 @@
                 </div>
               </div>
 
-              <form onSubmit={handleReserve} className="mt-4 grid grid-cols-1 md:grid-cols-4 gap-3">
+              <form onSubmit={handleReserve} className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3">
                 <input
                   className={inputBase}
                   type="text"
@@ -455,15 +463,6 @@
                   onChange={(e) => setName(e.target.value)}
                   disabled={!isOpen || list.length >= capacity}
                   aria-label="이름"
-                />
-                <input
-                  className={inputBase}
-                  type="text"
-                  placeholder="비밀번호(취소용)"
-                  value={pw}
-                  onChange={(e) => setPW(e.target.value)}
-                  disabled={!isOpen || list.length >= capacity}
-                  aria-label="비밀번호(취소에 사용)"
                 />
                 <button
                   className={btnPrimary}

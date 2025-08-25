@@ -81,6 +81,10 @@
       font-family: 'BR Cobane', sans-serif;
     }
     @media screen and (prefers-color-scheme: dark) {
+      #login {
+        filter: brightness(0.863) invert(1);
+      }
+
       .circle-green {
         --color-bg: oklch(44.8% 0.119 151.328);
       }
@@ -118,7 +122,8 @@
                 data-theme="outline"
                 data-text="continue_with"
                 data-size="medium"
-                data-width="200">
+                data-width="200"
+                >
             </div>
             <div id="login-mockup">
               <img class="pfp" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAAAAAA6fptVAAAACklEQVQIHWM4AwAAzgDNUwEBJAAAAABJRU5ErkJggg=="/>
@@ -155,8 +160,8 @@
   </script>
   <script type="text/babel">
     const { useEffect, useMemo, useRef, useState } = React;
-    const URL = "https://script.google.com/macros/s/AKfycbzad2KguOwsStBATrV_rAUL-JHyWFd583w3jdhZF4UE6BlplWKIFXB6_gJ1hTj0lBDZxQ/exec" // version 24
-    const AUTH_URL = "https://script.google.com/macros/s/AKfycbxWWGQbwf7XTRf67T5MIqmL0WY0064-__165ukUr7cPn27NsFV9ipt7YJ3UIJagKZba9g/exec" // login version 2
+    const URL = "https://script.google.com/macros/s/AKfycbyr2Rl3KQlEfGwQhoM2hj6xYqRLqyFKPdYdhNm52lyuYW08lkUyxyT0L4kAAqv3SIuqQg/exec"
+    const AUTH_URL = "https://script.google.com/macros/s/AKfycbzpfqQlweUwjvM8oGAuLA4qXUBU_7UhwM32kPmh3F1lndzJ3YUHPK_eG7gFeGXaDSD4Mg/exec"
     var last_submit = localStorage.getItem("last_submit")
     if ((last_submit==null || last_submit==undefined)) {
       // 처음 접속
@@ -610,7 +615,7 @@
     }
             
     const root = ReactDOM.createRoot(document.getElementById("root"));
-          root.render(<StudyCafeReservation />);
+    root.render(<StudyCafeReservation />);
   </script>
 </body>
 </html>

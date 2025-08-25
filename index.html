@@ -153,7 +153,7 @@
   </script>
   <script type="text/babel">
     const { useEffect, useMemo, useRef, useState } = React;
-    const URL = "https://script.google.com/macros/s/AKfycbzgIzLss6zMCyAF6RXqz2B47vJCE7x2sa4ZCLxuyUI0l0TqlfEyT4N3aw6gdXs53XoAnA/exec" // version 23
+    const URL = "https://script.google.com/macros/s/AKfycbzad2KguOwsStBATrV_rAUL-JHyWFd583w3jdhZF4UE6BlplWKIFXB6_gJ1hTj0lBDZxQ/exec" // version 24
     const AUTH_URL = "https://script.google.com/macros/s/AKfycbxWWGQbwf7XTRf67T5MIqmL0WY0064-__165ukUr7cPn27NsFV9ipt7YJ3UIJagKZba9g/exec" // login version 2
     
     function StudyCafeReservation() {
@@ -192,10 +192,10 @@
       const [listLoading, setListLoading] = useState(true);
       const [list, setList] = useState([]);
 
-      const [reload, setReload] = useState(true);
+      const [fetching, setFetching] = useState(true);
       const [lastReload, setLastReload] = useState(new Date(0));
       useEffect(() => {
-        if (!reload) return;
+        if (!fetching) return;
         if (getSeoulNow()-lastReload < 1000) return;
         setLastReload(getSeoulNow());
         (async () => {
@@ -209,7 +209,7 @@
             return [];
           }
         })().then((data) => {
-          setList(JSON.parse(data).map((e) => ({studentId:e[0], name:e[1], date: new Date(e[3])})));
+          setList(JSON.parse(data).map((e) => ({studentId:e[0], name:e[1], date: new Date(e[3]), sub: e[4]})));
           setListLoading(false);
           console.log("init start")
         })
@@ -219,14 +219,17 @@
       const [name, setName] = useState("");
       const [error, setError] = useState("");
       const [ok, setOk] = useState("");
+      const [progress, setProgress] = useState("");
 
       const capacity = 15;
       const remaining = Math.max(0, capacity - list.length);
 
       const handleReserve = (e) => {
         e.preventDefault();
+        if (!fetching) return;
         setError("");
         setOk("");
+        setProgress("");
         
         if (GOOGLE_SUB == null) {
           setError("우상단의 버튼을 눌러 구글 계정으로 로그인하세요.");
@@ -246,7 +249,7 @@
           return;
         }
 
-        setError("예약 요청을 보냈습니다. 잠시 기다려 주세요...")
+        setProgress("예약 요청을 보냈습니다. 잠시 기다려 주세요...")
         
         const data = {
           studentId: studentId.trim(),
@@ -254,7 +257,7 @@
           sub: GOOGLE_SUB
         };
         
-        setReload(false);
+        setFetching(false);
         fetch(URL, {
           method: "POST",
           redirect: "follow",
@@ -264,7 +267,8 @@
           body: JSON.stringify(data),
         }).then(response => response.text())
         .then(result => {
-          setReload(true);
+          setProgress("");
+          setFetching(true);
           if (result.startsWith("fail")) {
             let msg = result.substring(6).split("\n");
             setError(msg[0]); // fail: [실패사유]
@@ -275,20 +279,21 @@
           setList(JSON.parse(result).map((e) => ({studentId:e[0], name:e[1], date: new Date(e[3])})));
           setStudentId("");
           setName("");
-          setError("");
           setOk("예약이 완료되었습니다! 오늘 야간 자율학습 시간에 이용 가능합니다.");
         })
         .catch(error => console.error('Error:', error));
       }
 
       const handleDeletion = (key) => {
+        if (!fetching) return;
         if (GOOGLE_SUB == null) {
           setError("우상단의 버튼을 눌러 구글 계정으로 로그인하세요.");
           return;
         }
         
-        setError("취소 요청을 보냈습니다. 잠시 기다려 주세요...");
+        setError("");
         setOk("");
+        setProgress("취소 요청을 보냈습니다. 잠시 기다려 주세요...");
         
         const data = {
           studentId: "DELETE",
@@ -296,7 +301,7 @@
           sub: GOOGLE_SUB
         };
         
-        setReload(false);
+        setFetching(false);
         fetch(URL, {
           method: "POST",
           redirect: "follow",
@@ -306,7 +311,8 @@
           body: JSON.stringify(data),
         }).then(response => response.text())
         .then(result => {
-          setReload(true);
+          setFetching(true);
+          setProgress("");
           if (result.startsWith("fail")) {
             let msg = result.substring(6).split("\n");
             setError(msg[0]); // fail: [실패사유]
@@ -315,7 +321,6 @@
             return;
           }
           setList(JSON.parse(result).map((e) => ({studentId:e[0], name:e[1], date: new Date(e[3])})));
-          setError("");
           setOk("예약 취소가 완료되었습니다.");
         })
         .catch(error => console.error('Error:', error));
@@ -479,6 +484,9 @@
               {ok && (
                 <div className="mt-4 rounded-2xl border border-emerald-200 bg-emerald-50 dark:border-emerald-700 dark:bg-emerald-950 px-4 py-3 text-emerald-700 dark:text-emerald-400 text-sm">{ok}</div>
               )}
+              {progress && (
+                <div className="mt-4 rounded-2xl border border-orange-200 bg-orange-50 dark:border-orange-700 dark:bg-orange-950 px-4 py-3 text-orange-700 dark:text-orange-400 text-sm">{progress}</div>
+              )}
               
               <div className="mt-10">
                 <div className="flex items-end justify-between">
@@ -506,9 +514,13 @@
                             </div>
                           </div>
                           <div className="flex gap-2">
-                            <button className="inline-block text-xs text-red-500 dark:text-red-600" onClick={() => handleDeletion(r.studentId)}>
-                              취소
-                            </button>
+                            {
+                              (r.sub!=null && r.sub==GOOGLE_SUB) && (
+                                <button className="inline-block text-xs text-red-500 dark:text-red-600" onClick={() => handleDeletion(r.studentId)}>
+                                  취소
+                                </button>
+                              )
+                            }
                             <div className="inline-block text-xs text-neutral-500 dark:text-neutral-300">
                               {new Date(r.date).toLocaleTimeString("ko-KR", { timeZone: "Asia/Seoul", hour: "2-digit", minute: "2-digit", second: "2-digit" })}
                             </div>

@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta property="og:image" content="https://cnshstudy.kro.kr/cnsh.png">
+  <meta property="og:image" content="https://www.cnshstudy.kro.kr/img/cnsh.png">
   <title>충남과학고 스터디 카페 예약 시스템</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="icon" href="logo.ico" type="image/x-icon">
-  <link rel="icon" href="logo.ico" type="image/x-icon" media="(prefers-color-scheme: light)">
-  <link rel="icon" href="logo-dark.ico" type="image/x-icon" media="(prefers-color-scheme: dark)"> 
+  <link rel="icon" href="img/logo.ico" type="image/x-icon">
+  <link rel="icon" href="img/logo.ico" type="image/x-icon" media="(prefers-color-scheme: light)">
+  <link rel="icon" href="img/logo-dark.ico" type="image/x-icon" media="(prefers-color-scheme: dark)"> 
   <!-- React 18 UMD -->
   <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
   <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
@@ -82,6 +82,9 @@
     }
     @media screen and (prefers-color-scheme: dark) {
       #login {
+        filter: brightness(0.863) invert(1);
+      }
+      .pfp {
         filter: brightness(0.863) invert(1);
       }
 
@@ -287,19 +290,19 @@
         setProgress("");
         
         if (GOOGLE_SUB == null) {
-          setError("우상단의 버튼을 눌러 구글 계정으로 로그인해야 합니다.");
+          setError("우상단의 버튼을 눌러 구글 계정으로 로그인하세요.");
           return;
         }
 
         checkIntegrity();
         let time_since = Date.now() - last_submit
         if (time_since < 900000) {
-          setError("예약한 뒤 15분 내에는 다시 예약할 수 없습니다.");
+          setError("예약한 뒤 15분 내에는 다시 예약할 수 없어요.");
           return;
         }
 
         if (!isOpen) {
-          setError("예약은 매일 13:20에서 18:20까지 오픈됩니다.");
+          setError("예약은 매일 13:20에서 18:20까지에만 할 수 있어요.");
           return;
         }
         if (!studentId.trim() || !name.trim()) {
@@ -339,6 +342,7 @@
           if (result.startsWith("fail")) {
             let msg = result.substring(6).split("\n");
             setError(msg[0]); // fail: [실패사유]
+            setLastSubmit(0, salt);
             if (msg.length < 2) return;
             setList(JSON.parse(msg[1]).map((e) => ({studentId:e[0], name:e[1], date: new Date(e[3]), sub: e[4]})));
             return;
@@ -346,7 +350,7 @@
           setList(JSON.parse(result).map((e) => ({studentId:e[0], name:e[1], date: new Date(e[3]), sub: e[4]})));
           setStudentId("");
           setName("");
-          setOk("예약이 완료되었습니다! 오늘 야간 자율학습 시간에 이용 가능합니다.");
+          setOk("예약이 완료되었어요. 오늘 야간 자율학습 시간에 이용하세요.");
         })
         .catch(error => console.error('Error:', error));
       }
@@ -391,7 +395,7 @@
             return;
           }
           setList(JSON.parse(result).map((e) => ({studentId:e[0], name:e[1], date: new Date(e[3])})));
-          setOk("예약 취소가 완료되었습니다.");
+          setOk("예약을 취소했어요.");
           setLastSubmit(0, salt);
         })
         .catch(error => console.error('Error:', error));

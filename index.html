@@ -25,20 +25,6 @@
     @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css');
     @import url('https://fonts.cdnfonts.com/css/br-cobane');
     html, body { background: white; }
-    
-    /* yamae login button */
-    #login-button * {
-      border-radius: 50%;
-      overflow: hidden;
-      border: none;
-      background: transparent;
-      width: 30px;
-      height: 30px;
-      box-sizing: border-box;
-      justify-content: center;
-      padding: 0;
-    }
-
 
     #login {
       position: relative;
@@ -47,11 +33,11 @@
     #login-mockup {
       border-radius: 50%;
       overflow: hidden;
-      border: none;
+      border: 1px solid #dadce0;
       display: none;
       transition: background-color 0.218s, border-color 0.218s;
-      width: 30px;
-      height: 30px;
+      height: 100%;
+      aspect-ratio: 1;
       position: absolute;
       right: 0;
       top: 0;
@@ -128,10 +114,10 @@
 
             <div id="login-button" class="g_id_signin"
                 data-type="icon"
-                data-shape="square"
+                data-shape="circle"
                 data-theme="outline"
                 data-text="continue_with"
-                data-size="large"
+                data-size="medium"
                 data-width="200">
             </div>
             <div id="login-mockup">

@@ -203,7 +203,7 @@
 
       const openingTime = useMemo(() => {
         const d = getSeoulNow();
-        d.setHours(6, 20, 0, 0); // 13:20 고정
+        d.setHours(13, 20, 0, 0); // 13:20 고정
         if (msUntilClose===0) d.setDate(d.getDate() + 1);
         return d;
       }, [now]);
@@ -296,7 +296,7 @@
         setProgress("");
         
         if (GOOGLE_SUB == null) {
-          setError("구글 계정으로 로그인 한 뒤 다시 시도해 주세요.");
+          setError("우상단의 버튼을 눌러 구글 계정으로 로그인해야 합니다.");
           return;
         }
 

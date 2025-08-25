@@ -346,12 +346,12 @@ function StudyCafeReservation() {
                 ) : (
                 listLoading ? (
                     <div
-                    className="absolute inset-y-0 left-0 rounded-full bg-neutral-300 transition-[width] duration-500"
+                    className="absolute inset-y-0 left-0 rounded-full bg-neutral-300 dark:bg-neutral-600 transition-[width] duration-500"
                     style={{ width: `100%` }}
                     />
                 ) : (
                     <div
-                    className="absolute inset-y-0 left-0 rounded-full bg-neutral-500 transition-[width,background-color] duration-500"
+                    className="absolute inset-y-0 left-0 rounded-full bg-neutral-500 dark:bg-neutral-400 transition-[width,background-color] duration-500"
                     style={{ width: `${Math.min(100, Math.round((1 - remaining / capacity) * 100))}%` }}
                     />
                 )
@@ -410,7 +410,7 @@ function StudyCafeReservation() {
             ) : (
                 <ol className="mt-4 divide-y divide-neutral-200 dark:divide-neutral-700 border border-neutral-200 dark:border-neutral-700 rounded-2xl overflow-hidden">
                     {list.length === 0 && (
-                    <li className="p-4 text-neutral-500 dark:text-neutral-300 text-sm">아직 예약이 없어요. 13:20에 오픈됩니다.</li>
+                    <li className="p-4 text-neutral-500 dark:text-neutral-300 text-sm">아직 예약이 없어요. 오픈은 13:20이에요.</li>
                     )}
                     {list.toReversed().map((r, idx) => (
                     <li key={r.studentId} className="flex items-center justify-between p-4">

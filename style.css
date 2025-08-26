@@ -370,6 +370,12 @@
       margin-block-end: calc(calc(var(--spacing) * 1) * calc(1 - var(--tw-space-y-reverse)));
     }
   }
+  /*
+  안녕하세요 여러분
+  공간 사이의 공간에 오신 것을 환영합니다
+
+  이끾끼 에리어
+  */
   .divide-y {
     :where(& > :not(:last-child)) {
       --tw-divide-y-reverse: 0;

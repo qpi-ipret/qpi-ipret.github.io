@@ -1,6 +1,6 @@
 # reserve
 
-충곽 스카 1.6
+충곽 스카 1.7
 
 ## guide
 
@@ -19,7 +19,7 @@ main 브랜치는 인터넷에 게시되지 않고, dist 브랜치가 게시됩�
     npx @tailwindcss/cli -i src/style.css -o dist/style.css
     ```
 
-5. src/index.js로 가서, 맨 위의 import문들의 주석을 풀고, 거의 맨 아래의 ReactDOM.createRoot에서 "ReactDOM."을 지웁니다.
+5. src/index.js로 가서, 맨 위의 import문들의 주석을 풀고, 그 밑의 두 줄(useState 등등과 SHA256의 정의)을 주석으로 만든 뒤 거의 맨 아래의 ReactDOM.createRoot에서 "ReactDOM."을 지웁니다.
 6. 여전히 _for_dist 폴더에서, 다음 커맨드를 실행합니다.
 
     ```zsh

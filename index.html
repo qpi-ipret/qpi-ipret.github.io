@@ -52,8 +52,8 @@
     </main>
     
     <script>
-      var GOOGLE_SUB = null
       const AUTH_URL = "https://script.google.com/macros/s/AKfycbzpfqQlweUwjvM8oGAuLA4qXUBU_7UhwM32kPmh3F1lndzJ3YUHPK_eG7gFeGXaDSD4Mg/exec"
+      var storage = {}
 
       async function handleCredentialResponse(response) {
         const idToken = response.credential;
@@ -70,9 +70,14 @@
           console.error(`fail: ${JSON.stringify(data)}`);
           return;
         }
-        $(".pfp").css("visibility", "visible");
-        $(".pfp").attr("src",data.payload.picture);
-        GOOGLE_SUB = data.payload.sub;
+        try {
+          $(".pfp").css("visibility", "visible");
+          $(".pfp").attr("src",data.pfp);
+        } finally {
+          storage.sub = data.sub;
+          storage.authdate = data.date;
+          storage.auth = data.auth;
+        }
       }
     </script>
 

@@ -425,7 +425,7 @@ function StudyCafeReservation() {
                         </div>
                         <div className="flex gap-2">
                         {
-                            (r.sub!=null && r.sub==GOOGLE_SUB) && (
+                            (isOpen && r.sub!=null && r.sub==GOOGLE_SUB) && (
                             <button className="inline-block text-xs text-red-500 dark:text-red-600" onClick={() => handleDeletion(r.studentId)}>
                                 취소
                             </button>

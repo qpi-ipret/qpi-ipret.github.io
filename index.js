@@ -1,4 +1,3 @@
-const { useEffect, useMemo, useRef, useState } = React;
 const URL = "https://script.google.com/macros/s/AKfycbyr2Rl3KQlEfGwQhoM2hj6xYqRLqyFKPdYdhNm52lyuYW08lkUyxyT0L4kAAqv3SIuqQg/exec"
 var last_submit = localStorage.getItem("last_submit")
 if ((last_submit==null || last_submit==undefined)) {
@@ -10,7 +9,7 @@ if ((last_submit==null || last_submit==undefined)) {
 function setLastSubmit(ls, salt) {
     last_submit = ls;
     localStorage.setItem("last_submit", ls);
-    sessionStorage.setItem("hash", CryptoJS.SHA256(salt + last_submit).toString())
+    storage.hash = SHA256(salt + last_submit).toString();
 }
 
 function StudyCafeReservation() {
@@ -32,7 +31,7 @@ function StudyCafeReservation() {
 
     const openingTime = useMemo(() => {
     const d = getSeoulNow();
-    d.setHours(13, 20, 0, 0); // 13:20 고정
+    d.setHours(8, 20, 0, 0); // 13:20 고정
     if (msUntilClose===0) d.setDate(d.getDate() + 1);
     return d;
     }, [now]);
@@ -55,12 +54,12 @@ function StudyCafeReservation() {
         console.log("데이터 변조가 있었습니다. 15분 동안 예약할 수 없습니다.");
         setLastSubmit(Date.now().toString(), salt);
     }
-    if (salt==null && sessionStorage.getItem("hash")==null) return;
-    if (sessionStorage.getItem("hash")==null) {
+    if (salt==null && storage.hash==null) return;
+    if (storage.hash==null) {
         console.log("데이터 변조가 있었습니다. 15분 동안 예약할 수 없습니다.");
         setLastSubmit(Date.now().toString(), salt);
     }
-    if (sessionStorage.getItem("hash")!=CryptoJS.SHA256(salt + last_submit).toString()) {
+    if (storage.hash!=SHA256(salt + last_submit).toString()) {
         console.log("데이터 변조가 있었습니다. 15분 동안 예약할 수 없습니다.");
         setLastSubmit(Date.now().toString(), salt);
     }
@@ -124,7 +123,7 @@ function StudyCafeReservation() {
     setOk("");
     setProgress("");
     
-    if (GOOGLE_SUB == null) {
+    if (storage.sub == null) {
         setError("우상단의 버튼을 눌러 구글 계정으로 로그인하세요.");
         return;
     }
@@ -154,7 +153,9 @@ function StudyCafeReservation() {
     const data = {
         studentId: studentId.trim(),
         name: name.trim(),
-        sub: GOOGLE_SUB
+        sub: storage.sub,
+        authdate: storage.authdate,
+        auth: storage.auth
     };
     
     setFetching(false);
@@ -192,7 +193,7 @@ function StudyCafeReservation() {
 
     const handleDeletion = (key) => {
     if (!fetching) return;
-    if (GOOGLE_SUB == null) {
+    if (storage.sub == null) {
         setError("구글 계정으로 로그인 한 뒤 다시 시도해 주세요.");
         return;
     }
@@ -204,7 +205,9 @@ function StudyCafeReservation() {
     const data = {
         studentId: "DELETE",
         key: key,
-        sub: GOOGLE_SUB
+        sub: storage.sub,
+        authdate: storage.authdate,
+        auth: storage.auth
     };
     
     setFetching(false);
@@ -425,7 +428,7 @@ function StudyCafeReservation() {
                         </div>
                         <div className="flex gap-2">
                         {
-                            (isOpen && r.sub!=null && r.sub==GOOGLE_SUB) && (
+                            (isOpen && r.sub!=null && r.sub==storage.sub) && (
                             <button className="inline-block text-xs text-red-500 dark:text-red-600" onClick={() => handleDeletion(r.studentId)}>
                                 취소
                             </button>

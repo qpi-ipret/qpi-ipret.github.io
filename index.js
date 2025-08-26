@@ -42,7 +42,7 @@ function StudyCafeReservation() {
 
     const openingTime = useMemo(() => {
     const d = getSeoulNow();
-    d.setHours(8, 20, 0, 0); // 13:20 고정
+    d.setHours(13, 20, 0, 0); // 13:20 고정
     if (msUntilClose===0) d.setDate(d.getDate() + 1);
     return d;
     }, [now]);

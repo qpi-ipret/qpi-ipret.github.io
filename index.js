@@ -1,3 +1,10 @@
+/*
+import * as React from 'react'
+import { useEffect, useMemo, useState } from 'react';
+import { createRoot } from 'react-dom/client';
+import { SHA256 } from 'crypto-js';
+*/
+
 const URL = "https://script.google.com/macros/s/AKfycbyr2Rl3KQlEfGwQhoM2hj6xYqRLqyFKPdYdhNm52lyuYW08lkUyxyT0L4kAAqv3SIuqQg/exec"
 var last_submit = localStorage.getItem("last_submit")
 if ((last_submit==null || last_submit==undefined)) {

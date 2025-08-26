@@ -113,7 +113,7 @@ function StudyCafeReservation() {
     const [ok, setOk] = useState("");
     const [progress, setProgress] = useState("");
 
-    const capacity = 15;
+    const capacity = 14;
     const remaining = Math.max(0, capacity - list.length);
 
     const handleReserve = (e) => {
@@ -272,7 +272,7 @@ function StudyCafeReservation() {
             <br/> 1층 언어실습실에서 만나요.
             </h1>
             <p className="text-neutral-600 dark:text-neutral-300 text-lg md:text-xl font-semibold">
-            매일 13:20~18:20 선착순 <strong>15명</strong> 예약 · 당일 야간 자율학습시간 이용
+            매일 13:20~18:20 선착순 <strong>{capacity}명</strong> 예약 · 당일 야간 자율학습시간 이용
             </p>
         </div>
         </section>
@@ -404,7 +404,7 @@ function StudyCafeReservation() {
             <div className="mt-10">
             <div className="flex items-end justify-between">
                 <h2 className="text-xl font-semibold tracking-tight">오늘의 예약 명단</h2>
-                <div className="text-xs text-neutral-500 dark:text-neutral-300">선착순 정렬 (최대 15명)</div>
+                <div className="text-xs text-neutral-500 dark:text-neutral-300">선착순 정렬 (최대 {capacity}명)</div>
             </div>
             {listLoading ? (
                 <ol className="mt-4 divide-y divide-neutral-200 dark:divide-neutral-700 border border-neutral-200 dark:border-neutral-700 rounded-2xl overflow-hidden">

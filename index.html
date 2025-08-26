@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ko" class="dark:bg-[#232323]">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta property="og:image" content="https://www.cnshstudy.kro.kr/img/cnsh.png">
+    <title>충남과학고 스터디 카페 예약 시스템</title>
+
+    <link rel="icon" href="img/logo.ico" type="image/x-icon">
+    <link rel="icon" href="img/logo.ico" type="image/x-icon" media="(prefers-color-scheme: light)">
+    <link rel="icon" href="img/logo-dark.ico" type="image/x-icon" media="(prefers-color-scheme: dark)"> 
+    <link rel="stylesheet" type="text/css" href="style.css">
+
+    <!-- JQuery + Google login -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+  </head>
+  <body>
+    <main class="min-h-screen bg-white dark:bg-[#232323] text-neutral-900 dark:text-neutral-100" style="font-family: -apple-system, BlinkMacSystemFont, 'Pretendard Variable', 'SF Pro Text', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif">
+      <header class="fixed w-full top-0 z-30 border-b border-neutral-200/60 dark:border-neutral-700/60 bg-white/70 dark:bg-[#232323]/70 backdrop-blur supports-[backdrop-filter]:bg-white/50">
+        <div class="max-w-3xl mx-auto px-6 flex items-center justify-between h-16">
+          <div class="flex items-center gap-2">
+            <div class="w-6 h-6 rounded-full circle qpilogo" style="background: conic-gradient(var(--qpi-color) 0deg 138.46deg, #234C93 138.46deg 360deg)"></div>
+            <span class="text-sm tracking-tight text-neutral-700 dark:text-neutral-200">충곽 스터디 카페 예약</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <div class="inline-block text-xs text-neutral-500 dark:text-neutral-300">Asia/Seoul · 매일 13:20~18:20 오픈</div>
+            <div class="inline-block" id="login">
+              <div id="g_id_onload"
+                data-client_id="1079132266010-4r209j6rtmohatvtf74cksqcq7cn4uv0.apps.googleusercontent.com"
+                data-context="use"
+                data-ux_mode="popup"
+                data-callback="handleCredentialResponse"
+                data-auto_prompt="false">
+              </div>
+              <div id="login-button" class="g_id_signin"
+                  data-type="icon"
+                  data-shape="circle"
+                  data-theme="outline"
+                  data-text="continue_with"
+                  data-size="medium"
+                  data-width="200">
+              </div>
+              <div id="login-mockup">
+                <img class="pfp" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAAAAAA6fptVAAAACklEQVQIHWM4AwAAzgDNUwEBJAAAAABJRU5ErkJggg=="/>
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+      <div id="root"></div>
+    </main>
+    
+    <script>
+      var GOOGLE_SUB = null
+      const AUTH_URL = "https://script.google.com/macros/s/AKfycbzpfqQlweUwjvM8oGAuLA4qXUBU_7UhwM32kPmh3F1lndzJ3YUHPK_eG7gFeGXaDSD4Mg/exec"
+
+      async function handleCredentialResponse(response) {
+        const idToken = response.credential;
+        $(".g_id_signin").css("visibility", "hidden");
+        $("#login-mockup").css("display", "flex");
+        const res = await fetch(AUTH_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify({ idToken })
+        });
+
+        const data = await res.json();
+        if (!data.success) {
+          console.error(`fail: ${JSON.stringify(data)}`);
+          return;
+        }
+        $(".pfp").css("visibility", "visible");
+        $(".pfp").attr("src",data.payload.picture);
+        GOOGLE_SUB = data.payload.sub;
+      }
+    </script>
+
+    <script src="main.js"></script>
+  </body>
+</html>

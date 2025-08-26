@@ -5,8 +5,12 @@ import { createRoot } from 'react-dom/client';
 import { SHA256 } from 'crypto-js';
 */
 
+const { useEffect, useMemo, useState } = React;
+const SHA256 = CryptoJS.SHA256;
+
 const URL = "https://script.google.com/macros/s/AKfycbyr2Rl3KQlEfGwQhoM2hj6xYqRLqyFKPdYdhNm52lyuYW08lkUyxyT0L4kAAqv3SIuqQg/exec"
-var last_submit = localStorage.getItem("last_submit")
+var last_submit = localStorage.getItem("last_submit");
+var aborts = new Set();
 if ((last_submit==null || last_submit==undefined)) {
     // 처음 접속
     last_submit = 0
@@ -84,11 +88,9 @@ function StudyCafeReservation() {
 
     const [fetching, setFetching] = useState(true);
     const [lastReload, setLastReload] = useState(new Date(0));
-    let aborts = new Set();
     useEffect(() => {
-    if (!fetching) return;
-    if (getSeoulNow()-lastReload < 2000) return;
-    setLastReload(getSeoulNow());
+    if (!fetching || aborts.size!=0) return;
+    if (getSeoulNow()-lastReload < 4000) return;
     const ctrl = new AbortController();
     const signal = ctrl.signal;
     aborts.add(ctrl);
@@ -111,7 +113,10 @@ function StudyCafeReservation() {
         setListLoading(false);
         console.log("init start")
     })
-    .finally(() => aborts.delete(ctrl));
+    .finally(() => {
+        setLastReload(getSeoulNow());
+        aborts.delete(ctrl)
+    });
     })
 
     const [studentId, setStudentId] = useState("");
